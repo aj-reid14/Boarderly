@@ -42,11 +42,13 @@ function CreateSampleImages() {
     let newImg = $(`<div id='img-${i}'>`);
     newImg.css({
       position: "absolute",
+      padding: "25px",
       top: imgTop,
       left: imgLeft,
       width: imgWidth,
       height: imgHeight,
       "background-color": colors[randColor],
+      transform: "rotateZ(-10deg)"
     });
 
     $("#vision-board").append(newImg);
@@ -59,7 +61,22 @@ function CreateSampleImages() {
     }
 
     colors.splice(randColor, 1);
+  }
 
+  let imgID;
+  let imgUpdate = "-=12px"
+  for (let i = 0; i < 10; i++) {
+    imgID = `img-${i}`;
+
+    if (i % 2 === 0) {
+      $(`#${imgID}`).css({
+        top: imgUpdate,
+        transform: "rotate(10deg)"
+      });
+    }
+    
+    if (i === 4) {imgUpdate = "+=12px"};
+    
   }
 
   console.log(`Width: ${visionBoardBox.width}`);
