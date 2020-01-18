@@ -1,11 +1,11 @@
 #content-area {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 #goal-entry-area {
+    position: absolute;
     text-align: center;
-    float: left;
     margin: 0;
     padding: 10px;
     width: 50%;
@@ -29,8 +29,8 @@
 }
 
 #vision-board-area {
+    position: absolute;
     text-align: center;
-    float: left;
     margin: 0;
     padding: 10px;
     width: 50%;
@@ -40,10 +40,10 @@
 }
 
 #vision-board {
-    position: relative;
     margin: auto;
-    width: 75%;
-    height: 40%;
+    margin-top: 25%;
+    width: 600px;
+    height: 350px;
     background-color: lightgrey;
     border: 3px solid black;
     box-shadow: 2px 2px 15px;
