@@ -40,7 +40,7 @@ function CreateSampleImages() {
 
   for (let i = 0; i < 10; i++) {
     randColor = Math.floor(Math.random() * colors.length);
-    let newImg = $(`<div id='img-${i}'>`);
+    let newImg = $(`<div class='boardIMG' id='img-${i}'>`);
     newImg.css({
       position: "absolute",
       padding: "25px",
