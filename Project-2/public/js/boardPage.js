@@ -4,6 +4,7 @@ $(document).ready(function() {
 });
 
 function ConfigureButtons() {
+
   $("#btn-add-goal").click(function() {
 
       let userInput = $("#goal-input").val().trim();
@@ -78,7 +79,4 @@ function CreateSampleImages() {
     if (i === 4) {imgUpdate = "+=12px"};
     
   }
-
-  console.log(`Width: ${visionBoardBox.width}`);
-  console.log(`Height: ${visionBoardBox.height}`);
 }
