@@ -23,7 +23,7 @@ let colors = [
   "green",
   "yellow",
   "orange",
-  "brown",
+  "lightgreen",
   "purple",
   "pink",
   "skyblue",
