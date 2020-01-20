@@ -1,6 +1,6 @@
 <div id="content-area">
 
-    <div id="goal-entry-area">
+    <div id="goal-entry-side">
         <div id="goal-entry">
             <h2>Enter A Goal</h2>
             <input id="goal-input" type="text" placeholder="Type something...">
@@ -11,13 +11,37 @@
 
     </div>
 
-    <div id="vision-board-area">
+    <div id="vision-board-side">
 
-        <div id="vision-board"></div />
+        <div id="vision-board-area">
+            <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
+            <div id="vision-board"></div>
+        </div>
 
     </div>
 
 </div>
+
+<nav id="navbar" class="navbar navbar-expand-lg">
+    <a class="navbar-brand" href="#">[boarderly]</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#">my account</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">about</a>
+            </li>
+        </ul>
+        <span class="navbar-text">
+            hello, user!
+        </span>
+    </div>
+</nav>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="/js/boardPage.js"></script>
