@@ -4,8 +4,6 @@ body {
 
 #content-area {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
     overflow-y: hidden;
@@ -14,7 +12,6 @@ body {
 }
 
 #navbar {
-    position: fixed;
     width: 100%;
     border-bottom: 4px solid black;
     background-color: rgb(121, 56, 56);
@@ -34,11 +31,11 @@ body {
     color: rgb(226, 96, 96);
 }
 
-#goal-entry-side, #vision-board-side {
+#boards-list-side, #vision-board-side {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-#goal-entry-side {
+#boards-list-side {
     position: absolute;
     text-align: center;
     margin: 0;
@@ -49,6 +46,14 @@ body {
     left: 0;
     overflow-x: hidden;
     overflow-y: scroll;
+}
+
+#boards-list-title {
+    display: inline-block;
+    position: relative;
+    top: 150px;
+    border-bottom: 2px solid black;
+    user-select: none;
 }
 
 #goal-entry {
@@ -85,6 +90,7 @@ body {
     position: relative;
     display: inline-block;
     top: 150px;
+    user-select: none;
 }
 
 #vision-board-title:hover {
@@ -103,7 +109,7 @@ body {
 }
 
 #vision-board-buttons {
-    margin-top: 7.5%;
+    margin-top: 8.5%;
     float: right;
 }
 
