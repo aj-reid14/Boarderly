@@ -1,5 +1,5 @@
 module.exports = function(sequelize, DataTypes) {
-  const user = sequelize.define("user", {
+  const User = sequelize.define("User", {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -27,10 +27,10 @@ module.exports = function(sequelize, DataTypes) {
   // associating user with board 
   // this just states that a user can have multiple boards 
 
-  user.associate = function(models) {
-    user.hasMany(models.board, {
+  User.associate = function(models) {
+    User.hasMany(models.Board, {
 
     }); 
   }; 
-  return user;
+  return User;
 };
