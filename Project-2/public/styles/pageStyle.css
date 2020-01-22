@@ -100,7 +100,7 @@ body {
     box-sizing: border-box;
     background-color: grey;
     outline: 2px dashed black;
-    opacity: 0.8 !important;
+    opacity: 0.8;
     transition: opacity 0.5s;
 }
 
@@ -214,7 +214,7 @@ body {
   /*********************************/
 
   @keyframes wiggleBoard {
-      33% {transform: rotateZ(-2deg);}
-      66% {transform: rotateZ(2deg);}
+      33% {transform: rotateZ(-5deg);}
+      66% {transform: rotateZ(5deg);}
       100% {transform: rotateZ(0deg); opacity: 1;}
   }
