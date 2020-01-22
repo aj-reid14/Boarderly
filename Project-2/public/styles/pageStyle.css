@@ -56,7 +56,26 @@ body {
     user-select: none;
 }
 
-#goal-entry {
+#create-new-board {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    top: 145px;
+    left: 10px;
+    background-color: white;
+    background-image: url("../images/edit.png");
+    background-size: 100% 100%;
+    border: 2px solid black;
+    border-radius: 50%;
+    transition: background-color 0.25s
+}
+
+#create-new-board:hover {
+    background-color: lightgray;
+}
+
+/* #goal-entry {
     padding-top: 25%;
 }
 
@@ -67,7 +86,7 @@ body {
 #goal-list li {
     text-align: center;
     list-style-position: inside;
-}
+} */
 
 #vision-board-side {
     position: absolute;
