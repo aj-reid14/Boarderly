@@ -5,15 +5,9 @@ $(document).ready(function() {
 
 function ConfigureButtons() {
 
-  $("#btn-add-goal").click(function() {
+  $("#add-btn").click(function() {
+    $("#goal-modal").modal('toggle');
 
-      let userInput = $("#goal-input").val().trim();
-
-      if (userInput !== "") {
-          let newGoal = $("<li></li>").text(userInput);
-          $("#goal-list").append(newGoal);
-          $("#goal-input").val("");
-      }
   });
 
   $("#create-new-board").click(function() {

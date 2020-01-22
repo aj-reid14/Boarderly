@@ -109,19 +109,6 @@ body {
     animation: wiggleBoard 0.1s linear 1 normal forwards;
 }
 
-/* #goal-entry {
-    padding-top: 25%;
-}
-
-#goal-input {
-    width: 60%;
-}
-
-#goal-list li {
-    text-align: center;
-    list-style-position: inside;
-} */
-
 #vision-board-side {
     position: absolute;
     text-align: center;
@@ -175,6 +162,11 @@ body {
 
 .boardIMG:hover {
     animation: scaleIMG 0.25s ease-in-out 1 alternate forwards;
+}
+
+#goal-select {
+    text-align: center;
+    width: 100%;
 }
 
 /********************/
