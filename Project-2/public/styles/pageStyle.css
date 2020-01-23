@@ -164,11 +164,6 @@ body {
     animation: scaleIMG 0.25s ease-in-out 1 alternate forwards;
 }
 
-#goal-select {
-    text-align: center;
-    width: 100%;
-}
-
 /********************/
 /* Custom Scrollbar */
 /********************/
@@ -185,12 +180,12 @@ body {
    
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: rgb(65, 101, 116); 
+    background: black; 
   }
   
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: skyblue; 
+    background: grey; 
   }
 
   /************************/
