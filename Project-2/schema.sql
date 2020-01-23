@@ -1,0 +1,4 @@
+DROP DATABASE IF EXISTS board_db;
+CREATE DATABASE board_db;
+
+
