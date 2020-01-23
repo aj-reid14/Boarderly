@@ -24,6 +24,21 @@ function ConfigureButtons() {
     newBoard.show({duration: 100});
 
   });
+  
+  $("#full-scr-btn").click(function(){
+
+    var elem = document.getElementById("vision-board-area");
+    if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+     elem.webkitRequestFullscreen();
+    }
+  })
+
 }
 
 let colors = [
