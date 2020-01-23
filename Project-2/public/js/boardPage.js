@@ -5,15 +5,24 @@ $(document).ready(function() {
 
 function ConfigureButtons() {
 
-  $("#btn-add-goal").click(function() {
+  $("#add-btn").click(function() {
+    $("#goal-modal").modal('toggle');
 
-      let userInput = $("#goal-input").val().trim();
+  });
 
-      if (userInput !== "") {
-          let newGoal = $("<li></li>").text(userInput);
-          $("#goal-list").append(newGoal);
-          $("#goal-input").val("");
-      }
+  $("#create-new-board").click(function() {
+    let newBoard = $("<div class='user-board-preview'>");
+    let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
+
+    newBoard.css({
+      width: visionBoardRect.width * 0.3,
+      height: visionBoardRect.height * 0.3
+    });
+
+    $("#user-boards").append(newBoard);
+    newBoard.hide();
+    newBoard.show({duration: 100});
+
   });
 }
 
