@@ -1,4 +1,6 @@
-<div class="modal fade" id="goal-modal" tabindex="-1" role="dialog" aria-labelledby="goal-modal-title" aria-hidden="true">
+{{!-- Modal - Pops up when user clicks on "add goal" button --}}
+<div class="modal fade" id="goal-modal" tabindex="-1" role="dialog" aria-labelledby="goal-modal-title"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -9,77 +11,94 @@
       </div>
       <div class="modal-body">
         <form>
-          <div class="form-group">
-            <label for="goal-title" class="col-form-label">[title]</label>
-            <input type="text" class="form-control" id="goal-title">
-          </div>
+          {{!-- Text Area for entering the goal description --}}
           <div class="form-group">
             <label for="goal-desc" class="col-form-label">[description]</label>
-            <textarea id="goal-desc" class="form-control" style="resize: none;"></textarea>
+            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..." style="resize: none;"></textarea>
+          </div>
+          {{!-- Text Box for entering the image link for the goal --}}
+          <div class="form-group">
+            <label for="goal-image" class="col-form-label">[image]</label>
+            <input type="text" class="form-control" id="goal-image" placeholder="Enter image address...">
           </div>
         </form>
       </div>
+      {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">OK</button>
+        <button id="confirm-goal-btn" type="button" class="btn btn-primary">OK</button> {{!-- This button should trigger the goal being added to a board--}}
       </div>
     </div>
   </div>
 </div>
 
+{{!-- "content-area" is the main div, this takes up the entire screen and displays the background --}}
 <div id="content-area">
 
-    <div id="boards-list-side">
+  {{!-- "boards-list-side" is the left half of the page, this shows the user's boards and the button to create a new board --}}
+  <div id="boards-list-side">
 
-        <section id="boards-list-header">
-            <h2>[my boards]</h2>
-            <div class="btn" id="create-new-board"></div>
-        </section>
+  {{!-- "boards-list-header" holds the '[my boards]' title and the create button for adding a new board --}}
+    <section id="boards-list-header">
+      <h2>[my boards]</h2>
+      <div class="btn" id="create-new-board"></div>
+    </section>
 
-        <div id="user-boards"></div>
+  {{!-- "user-boards" is the div where the smaller board preview appears every time a user creates a new baord --}}
+    <div id="user-boards"></div>
 
+  </div>
+
+{{!-- "vision-board-side" is the right half of the page, this displays the current board being worked on along with the buttons for adding a goal / editing / saving --}}
+  <div id="vision-board-side">
+    
+    {{!-- "vision-board-area" contains everything from the title of the board down to the buttons, including the board itself --}}
+    <div id="vision-board-area">
+      <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
+      
+      {{!-- "vision-board" represents the vision board on the right, this should update as users add/edit their goals --}}
+      {{!-- the colored/blank placeholder squares that appear at the beginning are created and added in 'boardPage.js' when the page is loaded --}}
+      <div id="vision-board"></div>
+
+      {{!-- "vision-board-buttons" contains the 'add-goal', 'edit', 'save', and 'view' buttons beneath the board --}}
+      <section id="vision-board-buttons">
+        <button id="add-btn" type="button" class="btn btn-secondary btn-lg">add goal</button>
+        <button id="edit-btn" type="button" class="btn btn-primary btn-lg">edit</button>
+        <button id="save-btn" type="button" class="btn btn-success btn-lg">save</button>
+        <button id="full-scr-btn" type="button" class="btn btn-success btn-lg">fullscreen</button>
+      </section>
     </div>
 
-    <div id="vision-board-side">
-
-        <div id="vision-board-area">
-            <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
-            <div id="vision-board"></div>
-
-            <section id="vision-board-buttons">
-                <button id="add-btn" type="button" class="btn btn-secondary btn-lg">add goal</button>
-                <button id="edit-btn" type="button" class="btn btn-primary btn-lg">edit</button>
-                <button id="save-btn" type="button" class="btn btn-success btn-lg">save</button>
-                <button id="full-scr-btn" type="button" class="btn btn-success btn-lg">full screen</button>
-            </section>
-        </div>
-
-    </div>
+  </div>
 
 </div>
 
+{{!-- This is the navbar that appears at the top of the screen --}}
 <nav id="navbar" class="navbar navbar-expand-lg">
-    <a class="navbar-brand" href="#">[boarderly]</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
-        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarText">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#">my account</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">about</a>
-            </li>
-        </ul>
-        <span class="navbar-text">
-            hello, user!
-        </span>
-    </div>
+  <a class="navbar-brand" href="#">[boarderly]</a> {{!-- The title of the page, this should lead to the home page when clicked --}}
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#">my account</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">about</a>
+      </li>
+    </ul>
+    <span class="navbar-text">
+      hello, user!
+    </span>
+  </div>
 </nav>
 
+{{!-- Area for adding any scripts needed --}}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+  integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="/js/boardPage.js"></script>
