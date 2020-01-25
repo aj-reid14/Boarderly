@@ -14,7 +14,8 @@
           {{!-- Text Area for entering the goal description --}}
           <div class="form-group">
             <label for="goal-desc" class="col-form-label">[description]</label>
-            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..." style="resize: none;"></textarea>
+            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..."
+              style="resize: none;"></textarea>
           </div>
           {{!-- Text Box for entering the image link for the goal --}}
           <div class="form-group">
@@ -26,7 +27,50 @@
       {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button id="confirm-goal-btn" type="button" class="btn btn-primary">OK</button> {{!-- This button should trigger the goal being added to a board--}}
+        <button id="confirm-goal-btn" type="button" class="btn btn-primary">OK</button>
+        {{!-- This button should trigger the goal being added to a board--}}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Modal - Pops up when user clicks on "create board" button --}}
+<div class="modal fade" id="board-modal" tabindex="-1" role="dialog" aria-labelledby="board-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="board-modal-title">Create New Board</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Box for entering the name of the board --}}
+          <div class="form-group">
+            <label for="board-name" class="col-form-label">[name]</label>
+            <input type="text" class="form-control" id="board-name" placeholder="Name your board!">
+          </div>
+          {{!-- Selection for choosing the type of board --}}
+          <div class="form-group">
+            <label for="board-desc" class="col-form-label">What kind of board is this?</label>
+            <select id="board-type">
+              <option value="fitness">Fitness</option>
+              <option value="career">Career</option>
+              <option value="lifestyle">Lifestyle</option>
+              <option value="health">Health</option>
+              <option value="academic">Academic</option>
+              <option value="personal">Personal</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      {{!-- Close & OK buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id="confirm-board-btn" type="button" class="btn btn-primary">OK</button>
+        {{!-- The 'OK' button should trigger the board preview being added to the user-boards area --}}
       </div>
     </div>
   </div>
@@ -38,24 +82,24 @@
   {{!-- "boards-list-side" is the left half of the page, this shows the user's boards and the button to create a new board --}}
   <div id="boards-list-side">
 
-  {{!-- "boards-list-header" holds the '[my boards]' title and the create button for adding a new board --}}
+    {{!-- "boards-list-header" holds the '[my boards]' title and the create button for adding a new board --}}
     <section id="boards-list-header">
       <h2>[my boards]</h2>
       <div class="btn" id="create-new-board"></div>
     </section>
 
-  {{!-- "user-boards" is the div where the smaller board preview appears every time a user creates a new baord --}}
+    {{!-- "user-boards" is the div where the smaller board preview appears every time a user creates a new baord --}}
     <div id="user-boards"></div>
 
   </div>
 
-{{!-- "vision-board-side" is the right half of the page, this displays the current board being worked on along with the buttons for adding a goal / editing / saving --}}
+  {{!-- "vision-board-side" is the right half of the page, this displays the current board being worked on along with the buttons for adding a goal / editing / saving --}}
   <div id="vision-board-side">
-    
+
     {{!-- "vision-board-area" contains everything from the title of the board down to the buttons, including the board itself --}}
     <div id="vision-board-area">
       <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
-      
+
       {{!-- "vision-board" represents the vision board on the right, this should update as users add/edit their goals --}}
       {{!-- the colored/blank placeholder squares that appear at the beginning are created and added in 'boardPage.js' when the page is loaded --}}
       <div id="vision-board"></div>
@@ -75,7 +119,8 @@
 
 {{!-- This is the navbar that appears at the top of the screen --}}
 <nav id="navbar" class="navbar navbar-expand-lg">
-  <a class="navbar-brand" href="#">[boarderly]</a> {{!-- The title of the page, this should lead to the home page when clicked --}}
+  <a class="navbar-brand" href="#">[boarderly]</a>
+  {{!-- The title of the page, this should lead to the home page when clicked --}}
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
     aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -101,4 +146,5 @@
   integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
   integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="/js/bundle.js"></script>
 <script src="/js/boardPage.js"></script>
