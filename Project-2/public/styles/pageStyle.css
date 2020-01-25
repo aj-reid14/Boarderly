@@ -6,11 +6,17 @@ body {
 /* Defines settings for the main div that holds all of the content */
 #content-area {
     position: absolute;
+    text-align: center;
     width: 100%;
     height: 100%;
     overflow-y: hidden;
     background-image: url("../images/nature-1.gif");
     background-size: 100% 100%;
+}
+
+/* Both the 'boards-list-side' & 'vision-board-side' should be hidden until a user logs in / creates an account */
+#boards-list-side, #vision-board-side {
+    display: none;
 }
 
 /* Defines settings for the navbar at top of page */
@@ -41,6 +47,13 @@ body {
 /* Sets a border for all buttons with the class ".btn" */
 .btn {
     border: 2px solid black;
+}
+
+/* Defines the settings / properties for the login area */
+#login-area {
+    display: inline-block;
+    z-index: 10;
+    margin: 10% auto;
 }
 
 /* Sets default background colors for left & right divs in the page (not shown when background images are showing) */

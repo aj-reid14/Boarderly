@@ -210,7 +210,11 @@ function SetUpLogin() {
 
   jwt.verify(token, "uSecret", function (err, decoded) {
     if (err) throw err;
-
     console.log(decoded);
   });
+}
+
+function ShowMainPage() {
+  $("#boards-list-side").css("display", "initial");
+  $("#vision-board-side").css("display", "initial");
 }

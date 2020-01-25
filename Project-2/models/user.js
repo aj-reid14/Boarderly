@@ -29,7 +29,6 @@ module.exports = function(sequelize, DataTypes) {
 
   User.associate = function(models) {
     User.hasMany(models.Board, {
-
     }); 
   }; 
   return User;

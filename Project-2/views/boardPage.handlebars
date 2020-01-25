@@ -1,3 +1,26 @@
+{{!-- This is the navbar that appears at the top of the screen --}}
+<nav id="navbar" class="navbar navbar-expand-lg">
+  <a class="navbar-brand" href="#">[boarderly]</a>
+  {{!-- The title of the page, this should lead to the home page when clicked --}}
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="#">my account</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">about</a>
+      </li>
+    </ul>
+    <span class="navbar-text">
+      hello, user!
+    </span>
+  </div>
+</nav>
+
 {{!-- Modal - Pops up when user clicks on "add goal" button --}}
 <div class="modal fade" id="goal-modal" tabindex="-1" role="dialog" aria-labelledby="goal-modal-title"
   aria-hidden="true">
@@ -116,6 +139,19 @@
 {{!-- "content-area" is the main div, this takes up the entire screen and displays the background --}}
 <div id="content-area">
 
+  <div id="login-area">
+    {{!-- <label for="user-name">username</label>
+    <input id="user-name" type="text"> <br />
+
+    <label for="user-pasword">password</label>
+    <input id="user-password" type="password"> <br /> --}}
+
+    <h1>Design Your Future!</h1>
+
+    <button id="signup-btn" type="button" class="btn btn-primary btn-md">sign up</button>
+    <button id="login-btn" type="button" class="btn btn-success btn-md">login</button>
+  </div>
+
   {{!-- "boards-list-side" is the left half of the page, this shows the user's boards and the button to create a new board --}}
   <div id="boards-list-side">
 
@@ -153,29 +189,6 @@
   </div>
 
 </div>
-
-{{!-- This is the navbar that appears at the top of the screen --}}
-<nav id="navbar" class="navbar navbar-expand-lg">
-  <a class="navbar-brand" href="#">[boarderly]</a>
-  {{!-- The title of the page, this should lead to the home page when clicked --}}
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
-    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarText">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="#">my account</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">about</a>
-      </li>
-    </ul>
-    <span class="navbar-text">
-      hello, user!
-    </span>
-  </div>
-</nav>
 
 {{!-- Area for adding any scripts needed --}}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
