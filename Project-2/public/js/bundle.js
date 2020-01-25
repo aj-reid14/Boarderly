@@ -27833,11 +27833,12 @@ module.exports = once;
 arguments[4][135][0].apply(exports,arguments)
 },{"buffer":47,"dup":135}],187:[function(require,module,exports){
 let jwt = require("jsonwebtoken");
+let editMode = false;
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
-  ConfigureButtons();
   CreateSampleImages();
+  ConfigureButtons();
   SetUpLogin();
 });
 
@@ -27850,16 +27851,24 @@ function ConfigureButtons() {
 
   // Changes the images on the board to 'edit' mode
   $("#edit-btn").click(function() {
+
+    editMode = true;
+
     let previews = $(".boardIMG").css({
-      "border-color": "white"
+      "border-color": "white",
+      "border-style": "dashed"
     });
   });
 
     
   // Changes the images on the board back to normal (exit edit mode)
   $("#done-btn").click(function() {
+
+    editMode = false;
+
     let previews = $(".boardIMG").css({
-      "border-color": "black"
+      "border-color": "black",
+      "border-style": "solid"
     });
   });
 
@@ -27896,6 +27905,10 @@ function ConfigureButtons() {
 
   });
 
+  $(".close-modal").click(function() {
+    ClearModalFields();
+  });
+
   // Show fullscreen view of the vision board when 'fullscreen' button is clicked
   $("#full-scr-btn").click(function () {
 
@@ -27910,6 +27923,18 @@ function ConfigureButtons() {
       elem.webkitRequestFullscreen();
     }
   });
+
+  $(".boardIMG").click(function() {
+
+    if (editMode) {
+      $("#editGoal-modal").modal('toggle');
+    }
+  });
+
+  $("#update-goal-btn").click(function() {
+    $("#edit-mode").modal('hide');
+  });
+
 }
 
 // This function creates and adds the 10 squares for goals on the vision board:
@@ -28003,7 +28028,13 @@ function CreateSampleImages() {
   }
 }
 
-// This Function sets up
+function ClearModalFields() {
+  $("#board-name").text("");
+  $("#goal-image").text("");
+  $("#goal-desc").text("");
+}
+
+// This Function sets up the login data
 function SetUpLogin() {
   let token = jwt.sign({
     tstUser: "itsMe",
