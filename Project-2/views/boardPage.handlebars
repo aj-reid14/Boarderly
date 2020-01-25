@@ -26,8 +26,45 @@
       </div>
       {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
         <button id="confirm-goal-btn" type="button" class="btn btn-primary">OK</button>
+        {{!-- This button should trigger the goal being added to a board--}}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Modal - Pops up when user clicks on a goal image when edit mode --}}
+<div class="modal fade" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editGoal-modal-title">Edit Goal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Area for changing the goal description --}}
+          <div class="form-group">
+            <label for="goal-desc" class="col-form-label">[description]</label>
+            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..."
+              style="resize: none;"></textarea>
+          </div>
+          {{!-- Text Box for entering the image link for the goal --}}
+          <div class="form-group">
+            <label for="goal-image" class="col-form-label">[image]</label>
+            <input type="text" class="form-control" id="goal-image" placeholder="Enter image address...">
+          </div>
+        </form>
+      </div>
+      {{!-- Close & OK buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+        <button id="delete-goal-btn" type="button" class="btn btn-danger" data-dismiss="modal">Clear</button>
+        <button id="update-goal-btn" type="button" class="btn btn-primary">OK</button>
         {{!-- This button should trigger the goal being added to a board--}}
       </div>
     </div>
@@ -68,7 +105,7 @@
       </div>
       {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
         <button id="confirm-board-btn" type="button" class="btn btn-primary">OK</button>
         {{!-- The 'OK' button should trigger the board preview being added to the user-boards area --}}
       </div>
@@ -108,7 +145,7 @@
       <section id="vision-board-buttons">
         <button id="add-btn" type="button" class="btn btn-secondary btn-lg">add goal</button>
         <button id="edit-btn" type="button" class="btn btn-primary btn-lg">edit</button>
-        <button id="save-btn" type="button" class="btn btn-success btn-lg">save</button>
+        <button id="done-btn" type="button" class="btn btn-success btn-lg">done</button>
         <button id="full-scr-btn" type="button" class="btn btn-success btn-lg">fullscreen</button>
       </section>
     </div>
