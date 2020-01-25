@@ -209,7 +209,7 @@ body {
 
   @keyframes scaleIMG {
       from {z-index: 5;}
-      to {transform: scale(1.5, 1.5); z-index: 5; opacity: 1; border-color: rgb(68, 3, 3);}
+      to {transform: scale(1.5, 1.5); z-index: 5; opacity: 1;}
   }
   
   /*********************************/

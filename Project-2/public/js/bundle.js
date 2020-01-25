@@ -27848,6 +27848,21 @@ function ConfigureButtons() {
     $("#goal-modal").modal('toggle');
   });
 
+  // Changes the images on the board to 'edit' mode
+  $("#edit-btn").click(function() {
+    let previews = $(".boardIMG").css({
+      "border-color": "white"
+    });
+  });
+
+    
+  // Changes the images on the board back to normal (exit edit mode)
+  $("#done-btn").click(function() {
+    let previews = $(".boardIMG").css({
+      "border-color": "black"
+    });
+  });
+
   // Display the 'Create New Board' modal when '#create-new-board' is clicked
   $("#create-new-board").click(function () {
     $("#board-modal").modal('toggle');
@@ -27856,7 +27871,9 @@ function ConfigureButtons() {
   // Creates a ".user-board-preview" when user clicks to create a new board:
   $("#confirm-board-btn").click(function () {
 
+    // Checks if board name is valid before creating the board
     let boardName = $("#board-name").val();
+
     if (boardName === "") {
       $("#board-name").attr("placeholder", "Enter a valid name!");
     } else {
