@@ -1,8 +1,10 @@
+let jwt = require("jsonwebtoken");
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
   ConfigureButtons();
   CreateSampleImages();
+  SetUpLogin();
 });
 
 function ConfigureButtons() {
@@ -137,4 +139,19 @@ function CreateSampleImages() {
     if (i === 4) { imgUpdate = "+=12px" };
 
   }
+}
+
+// This Function sets up
+function SetUpLogin() {
+  let token = jwt.sign({
+    tstUser: "itsMe",
+    tstPK: "123123"
+  }, "uSecret", {expiresIn: "1h"});
+  console.log("Token: " + token);
+
+  jwt.verify(token, "uSecret", function(err, decoded) {
+    if (err) throw err;
+
+    console.log(decoded);
+  });
 }
