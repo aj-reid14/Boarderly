@@ -132,7 +132,7 @@ body {
     height: 100%;
     border-left: 2px solid black;
     left: 50%;
-    overflow-x: hidden;
+    overflow-x: scroll;
     overflow-y: scroll;
 }
 
