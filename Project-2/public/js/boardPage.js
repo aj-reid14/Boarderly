@@ -12,25 +12,36 @@ function ConfigureButtons() {
   // Display the 'Add New Goal' modal when '#add-btn' is clicked
   $("#add-btn").click(function () {
     $("#goal-modal").modal('toggle');
+  });
 
+  // Display the 'Create New Board' modal when '#create-new-board' is clicked
+  $("#create-new-board").click(function () {
+    $("#board-modal").modal('toggle');
   });
 
   // Creates a ".user-board-preview" when user clicks to create a new board:
-  $("#create-new-board").click(function () {
+  $("#confirm-board-btn").click(function () {
 
-    let newBoard = $("<div class='user-board-preview'>");
-    let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
+    let boardName = $("#board-name").val();
+    if (boardName === "") {
+      $("#board-name").attr("placeholder", "Enter a valid name!");
+    } else {
+      $("#board-modal").modal('hide');
 
-    // Set width/height to 30% of the main vision board's size
-    newBoard.css({
-      width: visionBoardRect.width * 0.3,
-      height: visionBoardRect.height * 0.3
-    });
-
-    // Add the board preview to the '#user-boards' div and display with an animation
-    $("#user-boards").append(newBoard);
-    newBoard.hide();
-    newBoard.show({ duration: 100 });
+      let newBoard = $("<div class='user-board-preview'>");
+      let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
+  
+      // Set width/height to 30% of the main vision board's size
+      newBoard.css({
+        width: visionBoardRect.width * 0.3,
+        height: visionBoardRect.height * 0.3
+      });
+  
+      // Add the board preview to the '#user-boards' div and display with an animation
+      $("#user-boards").append(newBoard);
+      newBoard.hide();
+      newBoard.show({ duration: 100 });
+    }
 
   });
 
@@ -47,7 +58,7 @@ function ConfigureButtons() {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     }
-  })
+  });
 }
 
 // This function creates and adds the 10 squares for goals on the vision board:
@@ -146,10 +157,10 @@ function SetUpLogin() {
   let token = jwt.sign({
     tstUser: "itsMe",
     tstPK: "123123"
-  }, "uSecret", {expiresIn: "1h"});
+  }, "uSecret", { expiresIn: "1h" });
   console.log("Token: " + token);
 
-  jwt.verify(token, "uSecret", function(err, decoded) {
+  jwt.verify(token, "uSecret", function (err, decoded) {
     if (err) throw err;
 
     console.log(decoded);

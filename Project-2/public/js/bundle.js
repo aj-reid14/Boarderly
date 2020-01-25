@@ -14510,7 +14510,7 @@ module.exports={
   "_id": "elliptic@6.5.2",
   "_inBundle": false,
   "_integrity": "sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==",
-  "_location": "/watchify/elliptic",
+  "_location": "/browserify/elliptic",
   "_phantomChildren": {},
   "_requested": {
     "type": "range",
@@ -14523,13 +14523,13 @@ module.exports={
     "fetchSpec": "^6.0.0"
   },
   "_requiredBy": [
-    "/watchify/browserify-sign",
-    "/watchify/create-ecdh"
+    "/browserify/browserify-sign",
+    "/browserify/create-ecdh"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.2.tgz",
   "_shasum": "05c5678d7173c049d8ca433552224a495d0e3762",
   "_spec": "elliptic@^6.0.0",
-  "_where": "C:\\Users\\AJ\\AppData\\Roaming\\npm\\node_modules\\watchify\\node_modules\\browserify-sign",
+  "_where": "C:\\Users\\AJ\\AppData\\Roaming\\npm\\node_modules\\browserify\\node_modules\\browserify-sign",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -25349,8 +25349,8 @@ module.exports = function (payload, secretOrPrivateKey, options, callback) {
   }
 };
 
-}).call(this,{"isBuffer":require("C:/Users/AJ/AppData/Roaming/npm/node_modules/watchify/node_modules/is-buffer/index.js")})
-},{"./lib/psSupported":167,"./lib/timespan":168,"C:/Users/AJ/AppData/Roaming/npm/node_modules/watchify/node_modules/is-buffer/index.js":100,"jws":174,"lodash.includes":179,"lodash.isboolean":180,"lodash.isinteger":181,"lodash.isnumber":182,"lodash.isplainobject":183,"lodash.isstring":184,"lodash.once":185}],172:[function(require,module,exports){
+}).call(this,{"isBuffer":require("C:/Users/AJ/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
+},{"./lib/psSupported":167,"./lib/timespan":168,"C:/Users/AJ/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":100,"jws":174,"lodash.includes":179,"lodash.isboolean":180,"lodash.isinteger":181,"lodash.isnumber":182,"lodash.isplainobject":183,"lodash.isstring":184,"lodash.once":185}],172:[function(require,module,exports){
 var JsonWebTokenError = require('./lib/JsonWebTokenError');
 var NotBeforeError    = require('./lib/NotBeforeError');
 var TokenExpiredError = require('./lib/TokenExpiredError');
@@ -27846,25 +27846,36 @@ function ConfigureButtons() {
   // Display the 'Add New Goal' modal when '#add-btn' is clicked
   $("#add-btn").click(function () {
     $("#goal-modal").modal('toggle');
+  });
 
+  // Display the 'Create New Board' modal when '#create-new-board' is clicked
+  $("#create-new-board").click(function () {
+    $("#board-modal").modal('toggle');
   });
 
   // Creates a ".user-board-preview" when user clicks to create a new board:
-  $("#create-new-board").click(function () {
+  $("#confirm-board-btn").click(function () {
 
-    let newBoard = $("<div class='user-board-preview'>");
-    let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
+    let boardName = $("#board-name").val();
+    if (boardName === "") {
+      $("#board-name").attr("placeholder", "Enter a valid name!");
+    } else {
+      $("#board-modal").modal('hide');
 
-    // Set width/height to 30% of the main vision board's size
-    newBoard.css({
-      width: visionBoardRect.width * 0.3,
-      height: visionBoardRect.height * 0.3
-    });
-
-    // Add the board preview to the '#user-boards' div and display with an animation
-    $("#user-boards").append(newBoard);
-    newBoard.hide();
-    newBoard.show({ duration: 100 });
+      let newBoard = $("<div class='user-board-preview'>");
+      let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
+  
+      // Set width/height to 30% of the main vision board's size
+      newBoard.css({
+        width: visionBoardRect.width * 0.3,
+        height: visionBoardRect.height * 0.3
+      });
+  
+      // Add the board preview to the '#user-boards' div and display with an animation
+      $("#user-boards").append(newBoard);
+      newBoard.hide();
+      newBoard.show({ duration: 100 });
+    }
 
   });
 
@@ -27881,7 +27892,7 @@ function ConfigureButtons() {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     }
-  })
+  });
 }
 
 // This function creates and adds the 10 squares for goals on the vision board:
@@ -27980,10 +27991,10 @@ function SetUpLogin() {
   let token = jwt.sign({
     tstUser: "itsMe",
     tstPK: "123123"
-  }, "uSecret", {expiresIn: "1h"});
+  }, "uSecret", { expiresIn: "1h" });
   console.log("Token: " + token);
 
-  jwt.verify(token, "uSecret", function(err, decoded) {
+  jwt.verify(token, "uSecret", function (err, decoded) {
     if (err) throw err;
 
     console.log(decoded);
