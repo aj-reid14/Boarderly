@@ -15,6 +15,7 @@
     "dotenv": "^8.0.0",
     "express": "^4.17.0",
     "express-handlebars": "^3.1.0",
+    "heroku": "^7.37.0",
     "install": "^0.13.0",
     "mysql2": "^1.6.5",
     "sequelize": "^5.8.6",
