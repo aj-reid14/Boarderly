@@ -22602,11 +22602,10 @@ function ConfigureButtons() {
     
     let newUser = {
       name: $("#newuser-name").val().trim(),
-      email: $("#newuser-email").val().trim(),
       password: cryptr.encrypt($("#newuser-password").val().trim())
     };
 
-    FindUser(newUser);
+    VerifyNewUser(newUser);
   });
 
   // Removes any stored data from local storage and switches back to login page
@@ -22628,6 +22627,13 @@ function ConfigureButtons() {
 
   // Confirms login then shows the main page content
   $("#confirm-login-btn").click(function () {
+    let user = {
+      name: $("#user-name").val().trim(),
+      password: cryptr.encrypt($("#user-password").val().trim())
+    };
+
+    VerifyUserLogin(user);
+
     $("#login-modal").modal('hide');
   });
 
@@ -22708,7 +22714,6 @@ function ConfigureButtons() {
   });
 
   $(".boardIMG").click(function () {
-
     if (editMode) {
       $("#editGoal-modal").modal('toggle');
     }
@@ -22851,23 +22856,22 @@ function CreateUser(userInfo) {
     $("#signup-modal").modal('hide');
 }
 
-function FindUser(userInfo) {
+function VerifyNewUser(userInfo) {
 
   $.ajax({
     method: "GET",
-    url: "api/user/" + userInfo.email,
+    url: "api/createuser/" + userInfo.name,
     data: userInfo
   }).then(function(result) {
     console.log(result);
     if (result !== null) {
       $("#newuser-name").val("");
-      $("#newuser-email").val("");
-      $("#newuser-email").addClass("invalid-field");
+      $("#newuser-name").addClass("invalid-field");
       $("#newuser-password").val("");
-      $("#newuser-email").attr("placeholder", "Email Already Exists");
+      $("#newuser-name").attr("placeholder", "Username Already Exists");
       return;
     } else {
-      $("#newuser-email").removeClass("invalid-field");
+      $("#newuser-name").removeClass("invalid-field");
       CreateUser(userInfo);
     }
   });

@@ -81,10 +81,20 @@ module.exports = function(app) {
 
   // *** User API routes ** //
 
-  app.get("/api/user/:email", function(req, res) {
+  app.get("/api/createuser/:name", function(req, res) {
     db.User.findOne({
       where: {
-        email: req.params.email
+        name: req.params.name
+      }
+    }).then(function(dbUser) {
+      res.json(dbUser);
+    });
+  });
+
+  app.get("/api/user/:name", function(req, res) {
+    db.User.findOne({
+      where: {
+        name: req.params.name
       }
     }).then(function(dbUser) {
       res.json(dbUser);
