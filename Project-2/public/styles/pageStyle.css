@@ -194,6 +194,7 @@ body {
 
 /* Defines settings for each "goal" image that appears on the vision board, the random colors and rotations are generated in boardPage.js */
 .boardIMG {
+    background-size: 100% 100%;
     box-sizing: border-box;
     border: 3px solid black;
     opacity: 0.95;

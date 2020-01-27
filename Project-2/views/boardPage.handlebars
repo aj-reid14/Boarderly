@@ -231,7 +231,7 @@
 
     {{!-- "vision-board-area" contains everything from the title of the board down to the buttons, including the board itself --}}
     <div id="vision-board-area">
-      <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
+      <h2 id="vision-board-title">[ <span id="board-title" boardID="">select a board</span> ]</h2>
 
       {{!-- "vision-board" represents the vision board on the right, this should update as users add/edit their goals --}}
       {{!-- the colored/blank placeholder squares that appear at the beginning are created and added in 'boardPage.js' when the page is loaded --}}
@@ -241,7 +241,7 @@
       <section id="vision-board-buttons">
         <button id="add-btn" type="button" class="btn btn-secondary btn-lg">add goal</button>
         <button id="edit-btn" type="button" class="btn btn-primary btn-lg">edit</button>
-        <button id="done-btn" type="button" class="btn btn-success btn-lg">done</button>
+        <button id="done-btn" disabled="true" type="button" class="btn btn-success btn-lg">done</button>
         <button id="full-scr-btn" type="button" class="btn btn-success btn-lg">fullscreen</button>
       </section>
     </div>

@@ -29,7 +29,7 @@ module.exports = function(app) {
     });
   });
 
-  // Create a new board
+  // Create a new board for specific user
 
   app.post("/api/boards/:userid", function(req, res) {
     db.Board.create(req.body).then(function(dbBoard) {
@@ -51,9 +51,20 @@ module.exports = function(app) {
 
   // *** Goal api routes ** //
 
+  // Get all goals for a specific board
+  app.get("/api/goals/:boardID", function(req, res) {
+    db.Goals.findAll({
+      where: {
+        BoardId: req.params.boardID
+      }
+    }).then(function(dbGoals) {
+      res.json(dbGoals);
+    });
+  });
+
   // create a new goal
 
-  app.post("/api/goals", function(req, res) {
+  app.post("/api/goals/:boardID", function(req, res) {
     db.Goals.create(req.body).then(function(dbGoals) {
       res.json(dbGoals);
     });
