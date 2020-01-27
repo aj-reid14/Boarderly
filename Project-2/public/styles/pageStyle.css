@@ -36,6 +36,10 @@ body {
     display: none;
 }
 
+.invalid-field::placeholder {
+    color: red;
+}
+
 /* This sets the title of the navbar "[boarderly]" to the middle of the navbar */
 .navbar-brand {
     position: absolute;

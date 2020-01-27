@@ -23883,7 +23883,6 @@ exports.createContext = Script.createContext = function (context) {
 }).call(this,require('_process'),require("timers").setImmediate)
 },{"_process":117,"crypto":55,"timers":153}],157:[function(require,module,exports){
 let bcryptjs = require("bcryptjs");
-let salt = bcryptjs.genSaltSync(10);
 let editMode = false;
 
 $(document).ready(function () {
@@ -23928,15 +23927,10 @@ function ConfigureButtons() {
       password: ""
     };
 
-    let pk = bcryptjs.hash($("#newuser-password").val().trim(), salt, function(err, hash) {
+    let pk = bcryptjs.hash($("#newuser-password").val().trim(), 5, function(err, hash) {
       newUser.password = hash;
     });
-
-    console.log(newUser);
-    CreateUser(newUser);
-    
-    $("#signup-modal").modal('hide');
-
+    FindUser(newUser);
   });
 
   // Display the 'Login' modal when '#login-btn' is clicked
@@ -24129,26 +24123,13 @@ function CreateSampleImages() {
   }
 }
 
-// // This Function sets up the login data
-// function SetUpLogin() {
-//   let token = jwt.sign({
-//     tstUser: "itsMe",
-//     tstPK: "123123"
-//   }, "uSecret", { expiresIn: "1h" });
-//   console.log("Token: " + token);
-
-//   jwt.verify(token, "uSecret", function (err, decoded) {
-//     if (err) throw err;
-//     console.log(decoded);
-//   });
-// }
-
 function ShowHomePage(user) {
   $("#login-area").fadeOut('fast', function() {
     $("#boards-list-side").fadeIn();
     $("#vision-board-side").fadeIn();
 
-    $("#user-welcome").text(`hello, ${user}!`);
+    $("#user-welcome").text(`hello, ${user.name}!`);
+    $("#user-welcome").val(`email, ${user.email}!`);
     $("#user-welcome").fadeIn();
     CreateSampleImages();
   });
@@ -24159,12 +24140,36 @@ function ShowHomePage(user) {
 /*---------------------------------------------------------------------------------*/
 
 function CreateUser(userInfo) {
+    $.ajax({
+      method: "POST",
+      url: "/api/user",
+      data: userInfo
+    }).then(function() {
+      ShowHomePage(userInfo);
+    });
+
+    $("#signup-modal").modal('hide');
+}
+
+function FindUser(userInfo) {
+
   $.ajax({
-    method: "POST",
-    url: "/api/user",
+    method: "GET",
+    url: "api/user/" + userInfo.email,
     data: userInfo
-  }).then(function() {
-    ShowHomePage(userInfo.name);
+  }).then(function(result) {
+    console.log(result);
+    if (result !== null) {
+      $("#newuser-name").val("");
+      $("#newuser-email").val("");
+      $("#newuser-email").addClass("invalid-field");
+      $("#newuser-password").val("");
+      $("#newuser-email").attr("placeholder", "Email Already Exists");
+      return;
+    } else {
+      $("#newuser-email").removeClass("invalid-field");
+      CreateUser(userInfo);
+    }
   });
 }
 },{"bcryptjs":156}]},{},[157]);
