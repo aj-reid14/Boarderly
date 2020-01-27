@@ -130,6 +130,11 @@ function ConfigureButtons() {
 
   });
 
+  $(document.body).on("click", ".user-board-preview", function() {
+    let title = $(this).attr("boardTitle");
+    $("#board-title").text(title);
+  });
+
   // Show fullscreen view of the vision board when 'fullscreen' button is clicked
   $("#full-scr-btn").click(function () {
 
@@ -360,13 +365,13 @@ function CheckForCreatedBoards(userID) {
     console.log(result);
     
     for (i = 0; i < result.length; i++) {
-      CreateBoardPreview(result[i].id);
+      CreateBoardPreview(result[i]);
     }
   });
 }
 
-function CreateBoardPreview(id) {
-  let newBoard = $(`<div class='user-board-preview' boardID='${id}'>`);
+function CreateBoardPreview(board) {
+  let newBoard = $(`<div class='user-board-preview' boardID='${board.id}' boardTitle='${board.title}'>`);
 
   // Set width/height to 30% of the main vision board's size
   newBoard.css({
