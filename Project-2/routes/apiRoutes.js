@@ -70,10 +70,10 @@ module.exports = function(app) {
     });
   });
 
-  // update a goal
+  // delete a goal by id
 
-  app.put("/api/boards/goals/:id", function(req, res) {
-    db.Goals.update(req.body, {
+  app.delete("/api/goals/:id", function(req, res) {
+    db.Goals.destroy({
       where: {
         id: req.params.id
       }
@@ -82,10 +82,10 @@ module.exports = function(app) {
     });
   });
 
-  // delete a goal by id
+  // update a goal
 
-  app.delete("/api/boards/goals/:id", function(req, res) {
-    db.Goals.destroy({
+  app.put("/api/boards/goals/:id", function(req, res) {
+    db.Goals.update(req.body, {
       where: {
         id: req.params.id
       }

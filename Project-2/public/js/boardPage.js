@@ -120,6 +120,7 @@ function ConfigureButtons() {
         $(boardIMGs[i]).css({
           "background-image": "none"
         });
+        DeleteGoal($(boardIMGs[i]).attr("goal"));
         break;
       }
 
@@ -489,6 +490,17 @@ function AddNewGoal(goalInfo) {
   });
 }
 
+function DeleteGoal(goalID) {
+
+  $.ajax({
+    method: "DELETE",
+    url: "/api/goals/" + goalID
+  }).then(function(result) {
+    console.log(result);
+  })
+
+}
+
 function UpdateBoard(boardID) {
 
   let boardIMGs = $(".boardIMG");
@@ -513,8 +525,7 @@ function UpdateBoard(boardID) {
           "background-image": `url(${result[i].image})`
         });
       }
-
   }
-  })
+  });
   
 }
