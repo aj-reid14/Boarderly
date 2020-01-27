@@ -52,6 +52,7 @@ function ConfigureButtons() {
     $("#boards-list-side").fadeOut('fast');
     $("#vision-board-side").fadeOut('fast');
     $("#user-welcome").text("");
+    $("#user-welcome").attr("userid", "");
     $("#login-area").fadeIn();
     
   });
@@ -108,12 +109,18 @@ function ConfigureButtons() {
   $("#confirm-board-btn").click(function () {
 
     // Checks if board name is valid before creating the board
-    let boardName = $("#board-name").val();
+    let board = {
+      title: $("#board-name").val().trim(),
+      type: $("#board-type option:selected").text(),
+      UserId: $("#user-welcome").attr("userid")
+    };
 
-    if (boardName === "") {
+    if (board.boardName === "") {
       $("#board-name").attr("placeholder", "Enter a valid name!");
     } else {
       $("#board-modal").modal('hide');
+  
+      AddNewBoard(board);
 
       let newBoard = $("<div class='user-board-preview'>");
       let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
@@ -279,10 +286,11 @@ function CreateUser(userInfo) {
       method: "POST",
       url: "/api/user",
       data: userInfo
-    }).then(function() {
+    }).then(function(result) {
       let userID = cryptr.encrypt(userInfo.name);
       localStorage.setItem("ID", userID);  
       $("#signup-modal").modal('hide');
+      $("#user-welcome").attr("userid", result.id);
       ShowHomePage(userInfo.name);
     });
 }
@@ -322,8 +330,19 @@ function VerifyUserLogin(userInfo) {
       return;
     } else {
       $("#user-name").removeClass("invalid-field");
+      $("#user-welcome").attr("userid", result.id);
       $("#login-modal").modal('hide');
       ShowHomePage(userInfo.name);
     }
+  });
+}
+
+function AddNewBoard(boardInfo) {
+  $.ajax({
+    method: "POST",
+    url: "api/boards/" + boardInfo.UserId,
+    data: boardInfo
+  }).then(function(result) {
+    console.log(result);
   });
 }

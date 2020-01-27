@@ -27,7 +27,7 @@ module.exports = function(app) {
 
   // Create a new board
 
-  app.post("/api/boards", function(req, res) {
+  app.post("/api/boards/:userid", function(req, res) {
     db.Board.create(req.body).then(function(dbBoard) {
       res.json(dbBoard);
     });
@@ -103,7 +103,7 @@ module.exports = function(app) {
 
   app.post("/api/user", function(req, res) {
     db.User.create(req.body).then(function(dbUser) {
-      res.render("boardPage");
+      res.json(dbUser);
     });
   });
 };
