@@ -56,7 +56,7 @@
 </div>
 
 {{!-- Modal - Edit Goal - Pops up when user clicks on a goal image when edit mode --}}
-<div class="modal fade" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
+<div class="modal fade" goal-id="" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -70,21 +70,21 @@
         <form>
           {{!-- Text Area for changing the goal description --}}
           <div class="form-group">
-            <label for="goal-desc" class="col-form-label">[description]</label>
-            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..."
+            <label for="editGoal-desc" class="col-form-label">[description]</label>
+            <textarea id="editGoal-desc" class="form-control" placeholder="Describe your goal here..."
               style="resize: none;"></textarea>
           </div>
           {{!-- Text Box for entering the image link for the goal --}}
           <div class="form-group">
-            <label for="goal-image" class="col-form-label">[image]</label>
-            <input type="text" class="form-control" id="goal-image" placeholder="Enter image address...">
+            <label for="editGoal-image" class="col-form-label">[image]</label>
+            <input type="text" class="form-control" id="editGoal-image" placeholder="Enter image address...">
           </div>
         </form>
       </div>
       {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
-        <button id="delete-goal-btn" type="button" class="btn btn-danger" data-dismiss="modal">Clear</button>
+        <button id="delete-goal-btn" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
         <button id="update-goal-btn" type="button" class="btn btn-primary">OK</button>
         {{!-- This button should trigger the goal being added to a board--}}
       </div>

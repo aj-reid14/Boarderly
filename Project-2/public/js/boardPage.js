@@ -100,9 +100,33 @@ function ConfigureButtons() {
     $("#done-btn").attr("disabled", false);
 
     let previews = $(".boardIMG").css({
-      "border-color": "white",
+      "border-color": "darkgreen",
       "border-style": "dashed"
     });
+  });
+  
+  $("#update-goal-btn").click(function () {
+    $("#editGoal-modal").modal('hide');
+  });
+
+  $("#delete-goal-btn").click(function () {
+    let boardIMGs = $(".boardIMG");
+
+    for (i = 0; i < boardIMGs.length; i++) {
+
+      if ($("#editGoal-modal").attr("goal-id") == $(boardIMGs[i]).attr("goal")) {
+        console.log(true);
+        $(boardIMGs[i]).attr("desc", "");
+        $(boardIMGs[i]).attr("img", "");
+        $(boardIMGs[i]).css({
+          "background-image": "none"
+        });
+        break;
+      }
+
+    }
+
+    $("#editGoal-modal").modal('hide');
   });
 
 
@@ -167,14 +191,14 @@ function ConfigureButtons() {
     }
   });
 
-  $(".boardIMG").click(function () {
+  $(document.body).on("click", ".boardIMG", function() {
     if (editMode) {
-      $("#editGoal-modal").modal('toggle');
-    }
-  });
+      $("#editGoal-desc").val($(this).attr("desc"));
+      $("#editGoal-image").val($(this).attr("img"));
 
-  $("#update-goal-btn").click(function () {
-    $("#edit-mode").modal('hide');
+      $("#editGoal-modal").modal('toggle');
+      $("#editGoal-modal").attr("goal-id", $(this).attr("goal"));
+    }
   });
 
 }
@@ -223,7 +247,7 @@ function CreateSampleImages() {
       randColor = Math.floor(Math.random() * colors.length);
 
       // Creates the new image
-      let newImg = $(`<div class='boardIMG' desc='' img='' id='img-${i}'>`); // adds ".boardIMG" class to image, sets id to img-[current i value]. results should have img-0 to img-9
+      let newImg = $(`<div class='boardIMG' goal='' desc='' img='' id='img-${i}'>`); // adds ".boardIMG" class to image, sets id to img-[current i value]. results should have img-0 to img-9
       newImg.css({
         position: "absolute",
         padding: "25px",
@@ -431,6 +455,7 @@ function AddNewGoal(goalInfo) {
             url: "api/goals/" + boardID,
             data: goalInfo
           }).then(function (insertResult) {
+            $(boardIMGs[i]).attr("goal", insertResult.id);
             $(boardIMGs[i]).attr("desc", insertResult.description);
             $(boardIMGs[i]).attr("img", insertResult.image);
 
@@ -471,6 +496,7 @@ function UpdateBoard(boardID) {
     url: "api/goals/" + boardID
   }).then(function(result) {
     for (i = 0; i < result.length; i++) {
+      $(boardIMGs[i]).attr("goal", result[i].id);
       $(boardIMGs[i]).attr("desc", result[i].description);
       $(boardIMGs[i]).attr("img", result[i].image);
 
