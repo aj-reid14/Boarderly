@@ -7,20 +7,9 @@ module.exports = function(sequelize, DataTypes) {
       isAlphanumeric: true
       }
     },
-    email: {
-      type: DataTypes.STRING, 
-      allowNull: false, 
-      validate: {
-        isEmail: true
-      }
-
-    },
     password: {
       type: DataTypes.STRING, 
-      allowNull: false, 
-      validate: {
-        len: [8,20]
-      }
+      allowNull: false
     }
   });
 
@@ -29,7 +18,6 @@ module.exports = function(sequelize, DataTypes) {
 
   User.associate = function(models) {
     User.hasMany(models.Board, {
-
     }); 
   }; 
   return User;

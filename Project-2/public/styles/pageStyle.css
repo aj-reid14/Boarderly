@@ -1,16 +1,22 @@
 /* Sets the font for the entire page */
 body {
     font-family: 'Jua', sans-serif;
+    overflow-y: hidden;
 }
 
 /* Defines settings for the main div that holds all of the content */
 #content-area {
     position: absolute;
+    text-align: center;
     width: 100%;
     height: 100%;
-    overflow-y: hidden;
-    background-image: url("../images/nature-1.gif");
+    /* background-image: url("../images/backgrounds/nature-1.gif"); */
     background-size: 100% 100%;
+}
+
+/* Both the 'boards-list-side' & 'vision-board-side' should be hidden until a user logs in / creates an account */
+#boards-list-side, #vision-board-side {
+    display: none;
 }
 
 /* Defines settings for the navbar at top of page */
@@ -24,6 +30,14 @@ body {
 /* Defines custom color for text on the navbar */
 .nav-link, .navbar-text, .navbar-brand {
     color: white;
+}
+
+#user-welcome {
+    display: none;
+}
+
+.invalid-field::placeholder {
+    color: red;
 }
 
 /* This sets the title of the navbar "[boarderly]" to the middle of the navbar */
@@ -41,6 +55,21 @@ body {
 /* Sets a border for all buttons with the class ".btn" */
 .btn {
     border: 2px solid black;
+}
+
+/* Defines the settings / properties for the login area */
+#login-area {
+    display: inline-block;
+    z-index: 10;
+    margin: 10% auto;
+    user-select: none;
+}
+
+#login-area h1 {
+    padding: 1%;
+    color: darkred;
+    border-bottom: 6px groove rgb(63, 0, 0);
+    animation: colorChange 3s linear infinite alternate forwards; 
 }
 
 /* Sets default background colors for left & right divs in the page (not shown when background images are showing) */
@@ -109,6 +138,7 @@ body {
 /* Defines settings for each board preview that is created when user adds a new board, this class is set in 'boardPage.js' whenever (+)/"create-new-board" button is clicked */
 .user-board-preview {
     position: relative;
+    text-align: center;
     display: inline-block;
     margin: 10px;
     box-sizing: border-box;
@@ -116,6 +146,12 @@ body {
     outline: 2px dashed black;
     opacity: 0.8;
     transition: opacity 0.5s;
+}
+
+.user-board-preview h3 {
+    padding: 2px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
 }
 
 .user-board-preview:hover {
@@ -147,8 +183,13 @@ body {
     user-select: none;
 }
 
-#vision-board-title:hover {
-    color: limegreen;
+#vision-board-thisGoal {
+    position: absolute;
+    display: none;
+}
+
+#thisGoal-description {
+    color: white;
 }
 
 #vision-board {
@@ -169,6 +210,7 @@ body {
 
 /* Defines settings for each "goal" image that appears on the vision board, the random colors and rotations are generated in boardPage.js */
 .boardIMG {
+    background-size: 100% 100%;
     box-sizing: border-box;
     border: 3px solid black;
     opacity: 0.95;
@@ -220,4 +262,12 @@ body {
       33% {transform: rotateZ(-5deg);}
       66% {transform: rotateZ(5deg);}
       100% {transform: rotateZ(0deg); opacity: 1;}
+  }
+
+  /**********************/
+  /* #login-area h1 (slogan) Animations */
+  /**********************/
+
+  @keyframes colorChange {
+      to {color: whitesmoke;}
   }

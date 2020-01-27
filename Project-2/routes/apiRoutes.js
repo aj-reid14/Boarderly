@@ -6,8 +6,12 @@ module.exports = function(app) {
 
   // Get all boards
 
-  app.get("/api/boards", function(req, res) {
-    db.Board.findAll({}).then(function(dbBoard) {
+  app.get("/api/boards/:userid", function(req, res) {
+    db.Board.findAll({
+      where: {
+        UserId: req.params.userid
+      }
+    }).then(function(dbBoard) {
       res.json(dbBoard);
     });
   });
@@ -25,9 +29,9 @@ module.exports = function(app) {
     });
   });
 
-  // Create a new board
+  // Create a new board for specific user
 
-  app.post("/api/boards", function(req, res) {
+  app.post("/api/boards/:userid", function(req, res) {
     db.Board.create(req.body).then(function(dbBoard) {
       res.json(dbBoard);
     });
@@ -47,17 +51,40 @@ module.exports = function(app) {
 
   // *** Goal api routes ** //
 
+  // Get all goals for a specific board
+  app.get("/api/goals/:boardID", function(req, res) {
+    db.Goals.findAll({
+      where: {
+        BoardId: req.params.boardID
+      }
+    }).then(function(dbGoals) {
+      res.json(dbGoals);
+    });
+  });
+
   // create a new goal
 
-  app.post("/api/goals", function(req, res) {
+  app.post("/api/goals/:boardID", function(req, res) {
     db.Goals.create(req.body).then(function(dbGoals) {
+      res.json(dbGoals);
+    });
+  });
+
+  // delete a goal by id
+
+  app.delete("/api/goals/:id", function(req, res) {
+    db.Goals.destroy({
+      where: {
+        id: req.params.id
+      }
+    }).then(function(dbGoals) {
       res.json(dbGoals);
     });
   });
 
   // update a goal
 
-  app.put("/api/boards/goals/:id", function(req, res) {
+  app.put("/api/goals/:id", function(req, res) {
     db.Goals.update(req.body, {
       where: {
         id: req.params.id
@@ -67,15 +94,31 @@ module.exports = function(app) {
     });
   });
 
-  // delete a goal by id
+  // *** User API routes ** //
 
-  app.delete("/api/boards/goals/:id", function(req, res) {
-    db.Goals.destroy({
+  app.get("/api/createuser/:name", function(req, res) {
+    db.User.findOne({
       where: {
-        id: req.params.id
+        name: req.params.name
       }
-    }).then(function(dbGoals) {
-      res.json(dbGoals);
+    }).then(function(dbUser) {
+      res.json(dbUser);
+    });
+  });
+
+  app.get("/api/user/:name", function(req, res) {
+    db.User.findOne({
+      where: {
+        name: req.params.name
+      }
+    }).then(function(dbUser) {
+      res.json(dbUser);
+    });
+  });
+
+  app.post("/api/user", function(req, res) {
+    db.User.create(req.body).then(function(dbUser) {
+      res.json(dbUser);
     });
   });
 };

@@ -72,7 +72,7 @@ Entity.prototype.encode = function encode(data, enc, /* internal */ reporter) {
   return this._getEncoder(enc).encode(data, reporter);
 };
 
-},{"../asn1":1,"inherits":99,"vm":158}],3:[function(require,module,exports){
+},{"../asn1":1,"inherits":99,"vm":155}],3:[function(require,module,exports){
 var inherits = require('inherits');
 var Reporter = require('../base').Reporter;
 var Buffer = require('buffer').Buffer;
@@ -22348,628 +22348,6 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],155:[function(require,module,exports){
-if (typeof Object.create === 'function') {
-  // implementation from standard node.js 'util' module
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    ctor.prototype = Object.create(superCtor.prototype, {
-      constructor: {
-        value: ctor,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-  };
-} else {
-  // old school shim for old browsers
-  module.exports = function inherits(ctor, superCtor) {
-    ctor.super_ = superCtor
-    var TempCtor = function () {}
-    TempCtor.prototype = superCtor.prototype
-    ctor.prototype = new TempCtor()
-    ctor.prototype.constructor = ctor
-  }
-}
-
-},{}],156:[function(require,module,exports){
-module.exports = function isBuffer(arg) {
-  return arg && typeof arg === 'object'
-    && typeof arg.copy === 'function'
-    && typeof arg.fill === 'function'
-    && typeof arg.readUInt8 === 'function';
-}
-},{}],157:[function(require,module,exports){
-(function (process,global){
-// Copyright Joyent, Inc. and other Node contributors.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the
-// "Software"), to deal in the Software without restriction, including
-// without limitation the rights to use, copy, modify, merge, publish,
-// distribute, sublicense, and/or sell copies of the Software, and to permit
-// persons to whom the Software is furnished to do so, subject to the
-// following conditions:
-//
-// The above copyright notice and this permission notice shall be included
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
-// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-// USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-var formatRegExp = /%[sdj%]/g;
-exports.format = function(f) {
-  if (!isString(f)) {
-    var objects = [];
-    for (var i = 0; i < arguments.length; i++) {
-      objects.push(inspect(arguments[i]));
-    }
-    return objects.join(' ');
-  }
-
-  var i = 1;
-  var args = arguments;
-  var len = args.length;
-  var str = String(f).replace(formatRegExp, function(x) {
-    if (x === '%%') return '%';
-    if (i >= len) return x;
-    switch (x) {
-      case '%s': return String(args[i++]);
-      case '%d': return Number(args[i++]);
-      case '%j':
-        try {
-          return JSON.stringify(args[i++]);
-        } catch (_) {
-          return '[Circular]';
-        }
-      default:
-        return x;
-    }
-  });
-  for (var x = args[i]; i < len; x = args[++i]) {
-    if (isNull(x) || !isObject(x)) {
-      str += ' ' + x;
-    } else {
-      str += ' ' + inspect(x);
-    }
-  }
-  return str;
-};
-
-
-// Mark that a method should not be used.
-// Returns a modified function which warns once by default.
-// If --no-deprecation is set, then it is a no-op.
-exports.deprecate = function(fn, msg) {
-  // Allow for deprecating things in the process of starting up.
-  if (isUndefined(global.process)) {
-    return function() {
-      return exports.deprecate(fn, msg).apply(this, arguments);
-    };
-  }
-
-  if (process.noDeprecation === true) {
-    return fn;
-  }
-
-  var warned = false;
-  function deprecated() {
-    if (!warned) {
-      if (process.throwDeprecation) {
-        throw new Error(msg);
-      } else if (process.traceDeprecation) {
-        console.trace(msg);
-      } else {
-        console.error(msg);
-      }
-      warned = true;
-    }
-    return fn.apply(this, arguments);
-  }
-
-  return deprecated;
-};
-
-
-var debugs = {};
-var debugEnviron;
-exports.debuglog = function(set) {
-  if (isUndefined(debugEnviron))
-    debugEnviron = process.env.NODE_DEBUG || '';
-  set = set.toUpperCase();
-  if (!debugs[set]) {
-    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
-      var pid = process.pid;
-      debugs[set] = function() {
-        var msg = exports.format.apply(exports, arguments);
-        console.error('%s %d: %s', set, pid, msg);
-      };
-    } else {
-      debugs[set] = function() {};
-    }
-  }
-  return debugs[set];
-};
-
-
-/**
- * Echos the value of a value. Trys to print the value out
- * in the best way possible given the different types.
- *
- * @param {Object} obj The object to print out.
- * @param {Object} opts Optional options object that alters the output.
- */
-/* legacy: obj, showHidden, depth, colors*/
-function inspect(obj, opts) {
-  // default options
-  var ctx = {
-    seen: [],
-    stylize: stylizeNoColor
-  };
-  // legacy...
-  if (arguments.length >= 3) ctx.depth = arguments[2];
-  if (arguments.length >= 4) ctx.colors = arguments[3];
-  if (isBoolean(opts)) {
-    // legacy...
-    ctx.showHidden = opts;
-  } else if (opts) {
-    // got an "options" object
-    exports._extend(ctx, opts);
-  }
-  // set default options
-  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-  if (isUndefined(ctx.depth)) ctx.depth = 2;
-  if (isUndefined(ctx.colors)) ctx.colors = false;
-  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-  if (ctx.colors) ctx.stylize = stylizeWithColor;
-  return formatValue(ctx, obj, ctx.depth);
-}
-exports.inspect = inspect;
-
-
-// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
-inspect.colors = {
-  'bold' : [1, 22],
-  'italic' : [3, 23],
-  'underline' : [4, 24],
-  'inverse' : [7, 27],
-  'white' : [37, 39],
-  'grey' : [90, 39],
-  'black' : [30, 39],
-  'blue' : [34, 39],
-  'cyan' : [36, 39],
-  'green' : [32, 39],
-  'magenta' : [35, 39],
-  'red' : [31, 39],
-  'yellow' : [33, 39]
-};
-
-// Don't use 'blue' not visible on cmd.exe
-inspect.styles = {
-  'special': 'cyan',
-  'number': 'yellow',
-  'boolean': 'yellow',
-  'undefined': 'grey',
-  'null': 'bold',
-  'string': 'green',
-  'date': 'magenta',
-  // "name": intentionally not styling
-  'regexp': 'red'
-};
-
-
-function stylizeWithColor(str, styleType) {
-  var style = inspect.styles[styleType];
-
-  if (style) {
-    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
-           '\u001b[' + inspect.colors[style][1] + 'm';
-  } else {
-    return str;
-  }
-}
-
-
-function stylizeNoColor(str, styleType) {
-  return str;
-}
-
-
-function arrayToHash(array) {
-  var hash = {};
-
-  array.forEach(function(val, idx) {
-    hash[val] = true;
-  });
-
-  return hash;
-}
-
-
-function formatValue(ctx, value, recurseTimes) {
-  // Provide a hook for user-specified inspect functions.
-  // Check that value is an object with an inspect function on it
-  if (ctx.customInspect &&
-      value &&
-      isFunction(value.inspect) &&
-      // Filter out the util module, it's inspect function is special
-      value.inspect !== exports.inspect &&
-      // Also filter out any prototype objects using the circular check.
-      !(value.constructor && value.constructor.prototype === value)) {
-    var ret = value.inspect(recurseTimes, ctx);
-    if (!isString(ret)) {
-      ret = formatValue(ctx, ret, recurseTimes);
-    }
-    return ret;
-  }
-
-  // Primitive types cannot have properties
-  var primitive = formatPrimitive(ctx, value);
-  if (primitive) {
-    return primitive;
-  }
-
-  // Look up the keys of the object.
-  var keys = Object.keys(value);
-  var visibleKeys = arrayToHash(keys);
-
-  if (ctx.showHidden) {
-    keys = Object.getOwnPropertyNames(value);
-  }
-
-  // IE doesn't make error fields non-enumerable
-  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
-  if (isError(value)
-      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
-    return formatError(value);
-  }
-
-  // Some type of object without properties can be shortcutted.
-  if (keys.length === 0) {
-    if (isFunction(value)) {
-      var name = value.name ? ': ' + value.name : '';
-      return ctx.stylize('[Function' + name + ']', 'special');
-    }
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    }
-    if (isDate(value)) {
-      return ctx.stylize(Date.prototype.toString.call(value), 'date');
-    }
-    if (isError(value)) {
-      return formatError(value);
-    }
-  }
-
-  var base = '', array = false, braces = ['{', '}'];
-
-  // Make Array say that they are Array
-  if (isArray(value)) {
-    array = true;
-    braces = ['[', ']'];
-  }
-
-  // Make functions say that they are functions
-  if (isFunction(value)) {
-    var n = value.name ? ': ' + value.name : '';
-    base = ' [Function' + n + ']';
-  }
-
-  // Make RegExps say that they are RegExps
-  if (isRegExp(value)) {
-    base = ' ' + RegExp.prototype.toString.call(value);
-  }
-
-  // Make dates with properties first say the date
-  if (isDate(value)) {
-    base = ' ' + Date.prototype.toUTCString.call(value);
-  }
-
-  // Make error with message first say the error
-  if (isError(value)) {
-    base = ' ' + formatError(value);
-  }
-
-  if (keys.length === 0 && (!array || value.length == 0)) {
-    return braces[0] + base + braces[1];
-  }
-
-  if (recurseTimes < 0) {
-    if (isRegExp(value)) {
-      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
-    } else {
-      return ctx.stylize('[Object]', 'special');
-    }
-  }
-
-  ctx.seen.push(value);
-
-  var output;
-  if (array) {
-    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-  } else {
-    output = keys.map(function(key) {
-      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-    });
-  }
-
-  ctx.seen.pop();
-
-  return reduceToSingleString(output, base, braces);
-}
-
-
-function formatPrimitive(ctx, value) {
-  if (isUndefined(value))
-    return ctx.stylize('undefined', 'undefined');
-  if (isString(value)) {
-    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
-                                             .replace(/'/g, "\\'")
-                                             .replace(/\\"/g, '"') + '\'';
-    return ctx.stylize(simple, 'string');
-  }
-  if (isNumber(value))
-    return ctx.stylize('' + value, 'number');
-  if (isBoolean(value))
-    return ctx.stylize('' + value, 'boolean');
-  // For some reason typeof null is "object", so special case here.
-  if (isNull(value))
-    return ctx.stylize('null', 'null');
-}
-
-
-function formatError(value) {
-  return '[' + Error.prototype.toString.call(value) + ']';
-}
-
-
-function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-  var output = [];
-  for (var i = 0, l = value.length; i < l; ++i) {
-    if (hasOwnProperty(value, String(i))) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          String(i), true));
-    } else {
-      output.push('');
-    }
-  }
-  keys.forEach(function(key) {
-    if (!key.match(/^\d+$/)) {
-      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
-          key, true));
-    }
-  });
-  return output;
-}
-
-
-function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-  var name, str, desc;
-  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-  if (desc.get) {
-    if (desc.set) {
-      str = ctx.stylize('[Getter/Setter]', 'special');
-    } else {
-      str = ctx.stylize('[Getter]', 'special');
-    }
-  } else {
-    if (desc.set) {
-      str = ctx.stylize('[Setter]', 'special');
-    }
-  }
-  if (!hasOwnProperty(visibleKeys, key)) {
-    name = '[' + key + ']';
-  }
-  if (!str) {
-    if (ctx.seen.indexOf(desc.value) < 0) {
-      if (isNull(recurseTimes)) {
-        str = formatValue(ctx, desc.value, null);
-      } else {
-        str = formatValue(ctx, desc.value, recurseTimes - 1);
-      }
-      if (str.indexOf('\n') > -1) {
-        if (array) {
-          str = str.split('\n').map(function(line) {
-            return '  ' + line;
-          }).join('\n').substr(2);
-        } else {
-          str = '\n' + str.split('\n').map(function(line) {
-            return '   ' + line;
-          }).join('\n');
-        }
-      }
-    } else {
-      str = ctx.stylize('[Circular]', 'special');
-    }
-  }
-  if (isUndefined(name)) {
-    if (array && key.match(/^\d+$/)) {
-      return str;
-    }
-    name = JSON.stringify('' + key);
-    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-      name = name.substr(1, name.length - 2);
-      name = ctx.stylize(name, 'name');
-    } else {
-      name = name.replace(/'/g, "\\'")
-                 .replace(/\\"/g, '"')
-                 .replace(/(^"|"$)/g, "'");
-      name = ctx.stylize(name, 'string');
-    }
-  }
-
-  return name + ': ' + str;
-}
-
-
-function reduceToSingleString(output, base, braces) {
-  var numLinesEst = 0;
-  var length = output.reduce(function(prev, cur) {
-    numLinesEst++;
-    if (cur.indexOf('\n') >= 0) numLinesEst++;
-    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
-  }, 0);
-
-  if (length > 60) {
-    return braces[0] +
-           (base === '' ? '' : base + '\n ') +
-           ' ' +
-           output.join(',\n  ') +
-           ' ' +
-           braces[1];
-  }
-
-  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
-}
-
-
-// NOTE: These type checking functions intentionally don't use `instanceof`
-// because it is fragile and can be easily faked with `Object.create()`.
-function isArray(ar) {
-  return Array.isArray(ar);
-}
-exports.isArray = isArray;
-
-function isBoolean(arg) {
-  return typeof arg === 'boolean';
-}
-exports.isBoolean = isBoolean;
-
-function isNull(arg) {
-  return arg === null;
-}
-exports.isNull = isNull;
-
-function isNullOrUndefined(arg) {
-  return arg == null;
-}
-exports.isNullOrUndefined = isNullOrUndefined;
-
-function isNumber(arg) {
-  return typeof arg === 'number';
-}
-exports.isNumber = isNumber;
-
-function isString(arg) {
-  return typeof arg === 'string';
-}
-exports.isString = isString;
-
-function isSymbol(arg) {
-  return typeof arg === 'symbol';
-}
-exports.isSymbol = isSymbol;
-
-function isUndefined(arg) {
-  return arg === void 0;
-}
-exports.isUndefined = isUndefined;
-
-function isRegExp(re) {
-  return isObject(re) && objectToString(re) === '[object RegExp]';
-}
-exports.isRegExp = isRegExp;
-
-function isObject(arg) {
-  return typeof arg === 'object' && arg !== null;
-}
-exports.isObject = isObject;
-
-function isDate(d) {
-  return isObject(d) && objectToString(d) === '[object Date]';
-}
-exports.isDate = isDate;
-
-function isError(e) {
-  return isObject(e) &&
-      (objectToString(e) === '[object Error]' || e instanceof Error);
-}
-exports.isError = isError;
-
-function isFunction(arg) {
-  return typeof arg === 'function';
-}
-exports.isFunction = isFunction;
-
-function isPrimitive(arg) {
-  return arg === null ||
-         typeof arg === 'boolean' ||
-         typeof arg === 'number' ||
-         typeof arg === 'string' ||
-         typeof arg === 'symbol' ||  // ES6 symbol
-         typeof arg === 'undefined';
-}
-exports.isPrimitive = isPrimitive;
-
-exports.isBuffer = require('./support/isBuffer');
-
-function objectToString(o) {
-  return Object.prototype.toString.call(o);
-}
-
-
-function pad(n) {
-  return n < 10 ? '0' + n.toString(10) : n.toString(10);
-}
-
-
-var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
-              'Oct', 'Nov', 'Dec'];
-
-// 26 Feb 16:19:34
-function timestamp() {
-  var d = new Date();
-  var time = [pad(d.getHours()),
-              pad(d.getMinutes()),
-              pad(d.getSeconds())].join(':');
-  return [d.getDate(), months[d.getMonth()], time].join(' ');
-}
-
-
-// log is just a thin wrapper to console.log that prepends a timestamp
-exports.log = function() {
-  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
-};
-
-
-/**
- * Inherit the prototype methods from one constructor into another.
- *
- * The Function.prototype.inherits from lang.js rewritten as a standalone
- * function (not on Function.prototype). NOTE: If this file is to be loaded
- * during bootstrapping this function needs to be rewritten using some native
- * functions as prototype setup using normal JavaScript does not work as
- * expected during bootstrapping (see mirror.js in r114903).
- *
- * @param {function} ctor Constructor function which needs to inherit the
- *     prototype.
- * @param {function} superCtor Constructor function to inherit prototype from.
- */
-exports.inherits = require('inherits');
-
-exports._extend = function(origin, add) {
-  // Don't do anything if add isn't an object
-  if (!add || !isObject(add)) return origin;
-
-  var keys = Object.keys(add);
-  var i = keys.length;
-  while (i--) {
-    origin[keys[i]] = add[keys[i]];
-  }
-  return origin;
-};
-
-function hasOwnProperty(obj, prop) {
-  return Object.prototype.hasOwnProperty.call(obj, prop);
-}
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./support/isBuffer":156,"_process":117,"inherits":155}],158:[function(require,module,exports){
 var indexOf = function (xs, item) {
     if (xs.indexOf) return xs.indexOf(item);
     else for (var i = 0; i < xs.length; i++) {
@@ -23120,4751 +22498,215 @@ exports.createContext = Script.createContext = function (context) {
     return copy;
 };
 
-},{}],159:[function(require,module,exports){
-/*jshint node:true */
-'use strict';
-var Buffer = require('buffer').Buffer; // browserify
-var SlowBuffer = require('buffer').SlowBuffer;
-
-module.exports = bufferEq;
-
-function bufferEq(a, b) {
-
-  // shortcutting on type is necessary for correctness
-  if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) {
-    return false;
-  }
-
-  // buffer sizes should be well-known information, so despite this
-  // shortcutting, it doesn't leak any information about the *contents* of the
-  // buffers.
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  var c = 0;
-  for (var i = 0; i < a.length; i++) {
-    /*jshint bitwise:false */
-    c |= a[i] ^ b[i]; // XOR
-  }
-  return c === 0;
-}
-
-bufferEq.install = function() {
-  Buffer.prototype.equal = SlowBuffer.prototype.equal = function equal(that) {
-    return bufferEq(this, that);
-  };
-};
-
-var origBufEqual = Buffer.prototype.equal;
-var origSlowBufEqual = SlowBuffer.prototype.equal;
-bufferEq.restore = function() {
-  Buffer.prototype.equal = origBufEqual;
-  SlowBuffer.prototype.equal = origSlowBufEqual;
-};
-
-},{"buffer":47}],160:[function(require,module,exports){
-'use strict';
-
-var Buffer = require('safe-buffer').Buffer;
-
-var getParamBytesForAlg = require('./param-bytes-for-alg');
-
-var MAX_OCTET = 0x80,
-	CLASS_UNIVERSAL = 0,
-	PRIMITIVE_BIT = 0x20,
-	TAG_SEQ = 0x10,
-	TAG_INT = 0x02,
-	ENCODED_TAG_SEQ = (TAG_SEQ | PRIMITIVE_BIT) | (CLASS_UNIVERSAL << 6),
-	ENCODED_TAG_INT = TAG_INT | (CLASS_UNIVERSAL << 6);
-
-function base64Url(base64) {
-	return base64
-		.replace(/=/g, '')
-		.replace(/\+/g, '-')
-		.replace(/\//g, '_');
-}
-
-function signatureAsBuffer(signature) {
-	if (Buffer.isBuffer(signature)) {
-		return signature;
-	} else if ('string' === typeof signature) {
-		return Buffer.from(signature, 'base64');
-	}
-
-	throw new TypeError('ECDSA signature must be a Base64 string or a Buffer');
-}
-
-function derToJose(signature, alg) {
-	signature = signatureAsBuffer(signature);
-	var paramBytes = getParamBytesForAlg(alg);
-
-	// the DER encoded param should at most be the param size, plus a padding
-	// zero, since due to being a signed integer
-	var maxEncodedParamLength = paramBytes + 1;
-
-	var inputLength = signature.length;
-
-	var offset = 0;
-	if (signature[offset++] !== ENCODED_TAG_SEQ) {
-		throw new Error('Could not find expected "seq"');
-	}
-
-	var seqLength = signature[offset++];
-	if (seqLength === (MAX_OCTET | 1)) {
-		seqLength = signature[offset++];
-	}
-
-	if (inputLength - offset < seqLength) {
-		throw new Error('"seq" specified length of "' + seqLength + '", only "' + (inputLength - offset) + '" remaining');
-	}
-
-	if (signature[offset++] !== ENCODED_TAG_INT) {
-		throw new Error('Could not find expected "int" for "r"');
-	}
-
-	var rLength = signature[offset++];
-
-	if (inputLength - offset - 2 < rLength) {
-		throw new Error('"r" specified length of "' + rLength + '", only "' + (inputLength - offset - 2) + '" available');
-	}
-
-	if (maxEncodedParamLength < rLength) {
-		throw new Error('"r" specified length of "' + rLength + '", max of "' + maxEncodedParamLength + '" is acceptable');
-	}
-
-	var rOffset = offset;
-	offset += rLength;
-
-	if (signature[offset++] !== ENCODED_TAG_INT) {
-		throw new Error('Could not find expected "int" for "s"');
-	}
-
-	var sLength = signature[offset++];
-
-	if (inputLength - offset !== sLength) {
-		throw new Error('"s" specified length of "' + sLength + '", expected "' + (inputLength - offset) + '"');
-	}
-
-	if (maxEncodedParamLength < sLength) {
-		throw new Error('"s" specified length of "' + sLength + '", max of "' + maxEncodedParamLength + '" is acceptable');
-	}
-
-	var sOffset = offset;
-	offset += sLength;
-
-	if (offset !== inputLength) {
-		throw new Error('Expected to consume entire buffer, but "' + (inputLength - offset) + '" bytes remain');
-	}
-
-	var rPadding = paramBytes - rLength,
-		sPadding = paramBytes - sLength;
-
-	var dst = Buffer.allocUnsafe(rPadding + rLength + sPadding + sLength);
-
-	for (offset = 0; offset < rPadding; ++offset) {
-		dst[offset] = 0;
-	}
-	signature.copy(dst, offset, rOffset + Math.max(-rPadding, 0), rOffset + rLength);
-
-	offset = paramBytes;
-
-	for (var o = offset; offset < o + sPadding; ++offset) {
-		dst[offset] = 0;
-	}
-	signature.copy(dst, offset, sOffset + Math.max(-sPadding, 0), sOffset + sLength);
-
-	dst = dst.toString('base64');
-	dst = base64Url(dst);
-
-	return dst;
-}
-
-function countPadding(buf, start, stop) {
-	var padding = 0;
-	while (start + padding < stop && buf[start + padding] === 0) {
-		++padding;
-	}
-
-	var needsSign = buf[start + padding] >= MAX_OCTET;
-	if (needsSign) {
-		--padding;
-	}
-
-	return padding;
-}
-
-function joseToDer(signature, alg) {
-	signature = signatureAsBuffer(signature);
-	var paramBytes = getParamBytesForAlg(alg);
-
-	var signatureBytes = signature.length;
-	if (signatureBytes !== paramBytes * 2) {
-		throw new TypeError('"' + alg + '" signatures must be "' + paramBytes * 2 + '" bytes, saw "' + signatureBytes + '"');
-	}
-
-	var rPadding = countPadding(signature, 0, paramBytes);
-	var sPadding = countPadding(signature, paramBytes, signature.length);
-	var rLength = paramBytes - rPadding;
-	var sLength = paramBytes - sPadding;
-
-	var rsBytes = 1 + 1 + rLength + 1 + 1 + sLength;
-
-	var shortLength = rsBytes < MAX_OCTET;
-
-	var dst = Buffer.allocUnsafe((shortLength ? 2 : 3) + rsBytes);
-
-	var offset = 0;
-	dst[offset++] = ENCODED_TAG_SEQ;
-	if (shortLength) {
-		// Bit 8 has value "0"
-		// bits 7-1 give the length.
-		dst[offset++] = rsBytes;
-	} else {
-		// Bit 8 of first octet has value "1"
-		// bits 7-1 give the number of additional length octets.
-		dst[offset++] = MAX_OCTET	| 1;
-		// length, base 256
-		dst[offset++] = rsBytes & 0xff;
-	}
-	dst[offset++] = ENCODED_TAG_INT;
-	dst[offset++] = rLength;
-	if (rPadding < 0) {
-		dst[offset++] = 0;
-		offset += signature.copy(dst, offset, 0, paramBytes);
-	} else {
-		offset += signature.copy(dst, offset, rPadding, paramBytes);
-	}
-	dst[offset++] = ENCODED_TAG_INT;
-	dst[offset++] = sLength;
-	if (sPadding < 0) {
-		dst[offset++] = 0;
-		signature.copy(dst, offset, paramBytes);
-	} else {
-		signature.copy(dst, offset, paramBytes + sPadding);
-	}
-
-	return dst;
-}
-
-module.exports = {
-	derToJose: derToJose,
-	joseToDer: joseToDer
-};
-
-},{"./param-bytes-for-alg":161,"safe-buffer":186}],161:[function(require,module,exports){
-'use strict';
-
-function getParamSize(keySize) {
-	var result = ((keySize / 8) | 0) + (keySize % 8 === 0 ? 0 : 1);
-	return result;
-}
-
-var paramBytesForAlg = {
-	ES256: getParamSize(256),
-	ES384: getParamSize(384),
-	ES512: getParamSize(521)
-};
-
-function getParamBytesForAlg(alg) {
-	var paramBytes = paramBytesForAlg[alg];
-	if (paramBytes) {
-		return paramBytes;
-	}
-
-	throw new Error('Unknown algorithm "' + alg + '"');
-}
-
-module.exports = getParamBytesForAlg;
-
-},{}],162:[function(require,module,exports){
-var jws = require('jws');
-
-module.exports = function (jwt, options) {
-  options = options || {};
-  var decoded = jws.decode(jwt, options);
-  if (!decoded) { return null; }
-  var payload = decoded.payload;
-
-  //try parse the payload
-  if(typeof payload === 'string') {
-    try {
-      var obj = JSON.parse(payload);
-      if(obj !== null && typeof obj === 'object') {
-        payload = obj;
-      }
-    } catch (e) { }
-  }
-
-  //return header if `complete` option is enabled.  header includes claims
-  //such as `kid` and `alg` used to select the key within a JWKS needed to
-  //verify the signature
-  if (options.complete === true) {
-    return {
-      header: decoded.header,
-      payload: payload,
-      signature: decoded.signature
-    };
-  }
-  return payload;
-};
-
-},{"jws":174}],163:[function(require,module,exports){
-module.exports = {
-  decode: require('./decode'),
-  verify: require('./verify'),
-  sign: require('./sign'),
-  JsonWebTokenError: require('./lib/JsonWebTokenError'),
-  NotBeforeError: require('./lib/NotBeforeError'),
-  TokenExpiredError: require('./lib/TokenExpiredError'),
-};
-
-},{"./decode":162,"./lib/JsonWebTokenError":164,"./lib/NotBeforeError":165,"./lib/TokenExpiredError":166,"./sign":171,"./verify":172}],164:[function(require,module,exports){
-var JsonWebTokenError = function (message, error) {
-  Error.call(this, message);
-  if(Error.captureStackTrace) {
-    Error.captureStackTrace(this, this.constructor);
-  }
-  this.name = 'JsonWebTokenError';
-  this.message = message;
-  if (error) this.inner = error;
-};
-
-JsonWebTokenError.prototype = Object.create(Error.prototype);
-JsonWebTokenError.prototype.constructor = JsonWebTokenError;
-
-module.exports = JsonWebTokenError;
-
-},{}],165:[function(require,module,exports){
-var JsonWebTokenError = require('./JsonWebTokenError');
-
-var NotBeforeError = function (message, date) {
-  JsonWebTokenError.call(this, message);
-  this.name = 'NotBeforeError';
-  this.date = date;
-};
-
-NotBeforeError.prototype = Object.create(JsonWebTokenError.prototype);
-
-NotBeforeError.prototype.constructor = NotBeforeError;
-
-module.exports = NotBeforeError;
-},{"./JsonWebTokenError":164}],166:[function(require,module,exports){
-var JsonWebTokenError = require('./JsonWebTokenError');
-
-var TokenExpiredError = function (message, expiredAt) {
-  JsonWebTokenError.call(this, message);
-  this.name = 'TokenExpiredError';
-  this.expiredAt = expiredAt;
-};
-
-TokenExpiredError.prototype = Object.create(JsonWebTokenError.prototype);
-
-TokenExpiredError.prototype.constructor = TokenExpiredError;
-
-module.exports = TokenExpiredError;
-},{"./JsonWebTokenError":164}],167:[function(require,module,exports){
-(function (process){
-var semver = require('semver');
-
-module.exports = semver.satisfies(process.version, '^6.12.0 || >=8.0.0');
-
-}).call(this,require('_process'))
-},{"_process":117,"semver":170}],168:[function(require,module,exports){
-var ms = require('ms');
-
-module.exports = function (time, iat) {
-  var timestamp = iat || Math.floor(Date.now() / 1000);
-
-  if (typeof time === 'string') {
-    var milliseconds = ms(time);
-    if (typeof milliseconds === 'undefined') {
-      return;
-    }
-    return Math.floor(timestamp + milliseconds / 1000);
-  } else if (typeof time === 'number') {
-    return timestamp + time;
-  } else {
-    return;
-  }
-
-};
-},{"ms":169}],169:[function(require,module,exports){
-/**
- * Helpers.
- */
-
-var s = 1000;
-var m = s * 60;
-var h = m * 60;
-var d = h * 24;
-var w = d * 7;
-var y = d * 365.25;
-
-/**
- * Parse or format the given `val`.
- *
- * Options:
- *
- *  - `long` verbose formatting [false]
- *
- * @param {String|Number} val
- * @param {Object} [options]
- * @throws {Error} throw an error if val is not a non-empty string or a number
- * @return {String|Number}
- * @api public
- */
-
-module.exports = function(val, options) {
-  options = options || {};
-  var type = typeof val;
-  if (type === 'string' && val.length > 0) {
-    return parse(val);
-  } else if (type === 'number' && isFinite(val)) {
-    return options.long ? fmtLong(val) : fmtShort(val);
-  }
-  throw new Error(
-    'val is not a non-empty string or a valid number. val=' +
-      JSON.stringify(val)
-  );
-};
-
-/**
- * Parse the given `str` and return milliseconds.
- *
- * @param {String} str
- * @return {Number}
- * @api private
- */
-
-function parse(str) {
-  str = String(str);
-  if (str.length > 100) {
-    return;
-  }
-  var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
-    str
-  );
-  if (!match) {
-    return;
-  }
-  var n = parseFloat(match[1]);
-  var type = (match[2] || 'ms').toLowerCase();
-  switch (type) {
-    case 'years':
-    case 'year':
-    case 'yrs':
-    case 'yr':
-    case 'y':
-      return n * y;
-    case 'weeks':
-    case 'week':
-    case 'w':
-      return n * w;
-    case 'days':
-    case 'day':
-    case 'd':
-      return n * d;
-    case 'hours':
-    case 'hour':
-    case 'hrs':
-    case 'hr':
-    case 'h':
-      return n * h;
-    case 'minutes':
-    case 'minute':
-    case 'mins':
-    case 'min':
-    case 'm':
-      return n * m;
-    case 'seconds':
-    case 'second':
-    case 'secs':
-    case 'sec':
-    case 's':
-      return n * s;
-    case 'milliseconds':
-    case 'millisecond':
-    case 'msecs':
-    case 'msec':
-    case 'ms':
-      return n;
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Short format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtShort(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return Math.round(ms / d) + 'd';
-  }
-  if (msAbs >= h) {
-    return Math.round(ms / h) + 'h';
-  }
-  if (msAbs >= m) {
-    return Math.round(ms / m) + 'm';
-  }
-  if (msAbs >= s) {
-    return Math.round(ms / s) + 's';
-  }
-  return ms + 'ms';
-}
-
-/**
- * Long format for `ms`.
- *
- * @param {Number} ms
- * @return {String}
- * @api private
- */
-
-function fmtLong(ms) {
-  var msAbs = Math.abs(ms);
-  if (msAbs >= d) {
-    return plural(ms, msAbs, d, 'day');
-  }
-  if (msAbs >= h) {
-    return plural(ms, msAbs, h, 'hour');
-  }
-  if (msAbs >= m) {
-    return plural(ms, msAbs, m, 'minute');
-  }
-  if (msAbs >= s) {
-    return plural(ms, msAbs, s, 'second');
-  }
-  return ms + ' ms';
-}
-
-/**
- * Pluralization helper.
- */
-
-function plural(ms, msAbs, n, name) {
-  var isPlural = msAbs >= n * 1.5;
-  return Math.round(ms / n) + ' ' + name + (isPlural ? 's' : '');
-}
-
-},{}],170:[function(require,module,exports){
-(function (process){
-exports = module.exports = SemVer
-
-var debug
-/* istanbul ignore next */
-if (typeof process === 'object' &&
-    process.env &&
-    process.env.NODE_DEBUG &&
-    /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
-  debug = function () {
-    var args = Array.prototype.slice.call(arguments, 0)
-    args.unshift('SEMVER')
-    console.log.apply(console, args)
-  }
-} else {
-  debug = function () {}
-}
-
-// Note: this is the semver.org version of the spec that it implements
-// Not necessarily the package version of this code.
-exports.SEMVER_SPEC_VERSION = '2.0.0'
-
-var MAX_LENGTH = 256
-var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
-  /* istanbul ignore next */ 9007199254740991
-
-// Max safe segment length for coercion.
-var MAX_SAFE_COMPONENT_LENGTH = 16
-
-// The actual regexps go on exports.re
-var re = exports.re = []
-var src = exports.src = []
-var R = 0
-
-// The following Regular Expressions can be used for tokenizing,
-// validating, and parsing SemVer version strings.
-
-// ## Numeric Identifier
-// A single `0`, or a non-zero digit followed by zero or more digits.
-
-var NUMERICIDENTIFIER = R++
-src[NUMERICIDENTIFIER] = '0|[1-9]\\d*'
-var NUMERICIDENTIFIERLOOSE = R++
-src[NUMERICIDENTIFIERLOOSE] = '[0-9]+'
-
-// ## Non-numeric Identifier
-// Zero or more digits, followed by a letter or hyphen, and then zero or
-// more letters, digits, or hyphens.
-
-var NONNUMERICIDENTIFIER = R++
-src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*'
-
-// ## Main Version
-// Three dot-separated numeric identifiers.
-
-var MAINVERSION = R++
-src[MAINVERSION] = '(' + src[NUMERICIDENTIFIER] + ')\\.' +
-                   '(' + src[NUMERICIDENTIFIER] + ')\\.' +
-                   '(' + src[NUMERICIDENTIFIER] + ')'
-
-var MAINVERSIONLOOSE = R++
-src[MAINVERSIONLOOSE] = '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
-                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
-                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')'
-
-// ## Pre-release Version Identifier
-// A numeric identifier, or a non-numeric identifier.
-
-var PRERELEASEIDENTIFIER = R++
-src[PRERELEASEIDENTIFIER] = '(?:' + src[NUMERICIDENTIFIER] +
-                            '|' + src[NONNUMERICIDENTIFIER] + ')'
-
-var PRERELEASEIDENTIFIERLOOSE = R++
-src[PRERELEASEIDENTIFIERLOOSE] = '(?:' + src[NUMERICIDENTIFIERLOOSE] +
-                                 '|' + src[NONNUMERICIDENTIFIER] + ')'
-
-// ## Pre-release Version
-// Hyphen, followed by one or more dot-separated pre-release version
-// identifiers.
-
-var PRERELEASE = R++
-src[PRERELEASE] = '(?:-(' + src[PRERELEASEIDENTIFIER] +
-                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))'
-
-var PRERELEASELOOSE = R++
-src[PRERELEASELOOSE] = '(?:-?(' + src[PRERELEASEIDENTIFIERLOOSE] +
-                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))'
-
-// ## Build Metadata Identifier
-// Any combination of digits, letters, or hyphens.
-
-var BUILDIDENTIFIER = R++
-src[BUILDIDENTIFIER] = '[0-9A-Za-z-]+'
-
-// ## Build Metadata
-// Plus sign, followed by one or more period-separated build metadata
-// identifiers.
-
-var BUILD = R++
-src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
-             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))'
-
-// ## Full Version String
-// A main version, followed optionally by a pre-release version and
-// build metadata.
-
-// Note that the only major, minor, patch, and pre-release sections of
-// the version string are capturing groups.  The build metadata is not a
-// capturing group, because it should not ever be used in version
-// comparison.
-
-var FULL = R++
-var FULLPLAIN = 'v?' + src[MAINVERSION] +
-                src[PRERELEASE] + '?' +
-                src[BUILD] + '?'
-
-src[FULL] = '^' + FULLPLAIN + '$'
-
-// like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
-// also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
-// common in the npm registry.
-var LOOSEPLAIN = '[v=\\s]*' + src[MAINVERSIONLOOSE] +
-                 src[PRERELEASELOOSE] + '?' +
-                 src[BUILD] + '?'
-
-var LOOSE = R++
-src[LOOSE] = '^' + LOOSEPLAIN + '$'
-
-var GTLT = R++
-src[GTLT] = '((?:<|>)?=?)'
-
-// Something like "2.*" or "1.2.x".
-// Note that "x.x" is a valid xRange identifer, meaning "any version"
-// Only the first item is strictly required.
-var XRANGEIDENTIFIERLOOSE = R++
-src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*'
-var XRANGEIDENTIFIER = R++
-src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*'
-
-var XRANGEPLAIN = R++
-src[XRANGEPLAIN] = '[v=\\s]*(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
-                   '(?:' + src[PRERELEASE] + ')?' +
-                   src[BUILD] + '?' +
-                   ')?)?'
-
-var XRANGEPLAINLOOSE = R++
-src[XRANGEPLAINLOOSE] = '[v=\\s]*(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
-                        '(?:' + src[PRERELEASELOOSE] + ')?' +
-                        src[BUILD] + '?' +
-                        ')?)?'
-
-var XRANGE = R++
-src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$'
-var XRANGELOOSE = R++
-src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$'
-
-// Coercion.
-// Extract anything that could conceivably be a part of a valid semver
-var COERCE = R++
-src[COERCE] = '(?:^|[^\\d])' +
-              '(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '})' +
-              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
-              '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
-              '(?:$|[^\\d])'
-
-// Tilde ranges.
-// Meaning is "reasonably at or greater than"
-var LONETILDE = R++
-src[LONETILDE] = '(?:~>?)'
-
-var TILDETRIM = R++
-src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+'
-re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g')
-var tildeTrimReplace = '$1~'
-
-var TILDE = R++
-src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$'
-var TILDELOOSE = R++
-src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$'
-
-// Caret ranges.
-// Meaning is "at least and backwards compatible with"
-var LONECARET = R++
-src[LONECARET] = '(?:\\^)'
-
-var CARETTRIM = R++
-src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+'
-re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g')
-var caretTrimReplace = '$1^'
-
-var CARET = R++
-src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$'
-var CARETLOOSE = R++
-src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$'
-
-// A simple gt/lt/eq thing, or just "" to indicate "any version"
-var COMPARATORLOOSE = R++
-src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$'
-var COMPARATOR = R++
-src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$'
-
-// An expression to strip any whitespace between the gtlt and the thing
-// it modifies, so that `> 1.2.3` ==> `>1.2.3`
-var COMPARATORTRIM = R++
-src[COMPARATORTRIM] = '(\\s*)' + src[GTLT] +
-                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')'
-
-// this one has to use the /g flag
-re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g')
-var comparatorTrimReplace = '$1$2$3'
-
-// Something like `1.2.3 - 1.2.4`
-// Note that these all use the loose form, because they'll be
-// checked against either the strict or loose comparator form
-// later.
-var HYPHENRANGE = R++
-src[HYPHENRANGE] = '^\\s*(' + src[XRANGEPLAIN] + ')' +
-                   '\\s+-\\s+' +
-                   '(' + src[XRANGEPLAIN] + ')' +
-                   '\\s*$'
-
-var HYPHENRANGELOOSE = R++
-src[HYPHENRANGELOOSE] = '^\\s*(' + src[XRANGEPLAINLOOSE] + ')' +
-                        '\\s+-\\s+' +
-                        '(' + src[XRANGEPLAINLOOSE] + ')' +
-                        '\\s*$'
-
-// Star ranges basically just allow anything at all.
-var STAR = R++
-src[STAR] = '(<|>)?=?\\s*\\*'
-
-// Compile to actual regexp objects.
-// All are flag-free, unless they were created above with a flag.
-for (var i = 0; i < R; i++) {
-  debug(i, src[i])
-  if (!re[i]) {
-    re[i] = new RegExp(src[i])
-  }
-}
-
-exports.parse = parse
-function parse (version, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (version instanceof SemVer) {
-    return version
-  }
-
-  if (typeof version !== 'string') {
-    return null
-  }
-
-  if (version.length > MAX_LENGTH) {
-    return null
-  }
-
-  var r = options.loose ? re[LOOSE] : re[FULL]
-  if (!r.test(version)) {
-    return null
-  }
-
-  try {
-    return new SemVer(version, options)
-  } catch (er) {
-    return null
-  }
-}
-
-exports.valid = valid
-function valid (version, options) {
-  var v = parse(version, options)
-  return v ? v.version : null
-}
-
-exports.clean = clean
-function clean (version, options) {
-  var s = parse(version.trim().replace(/^[=v]+/, ''), options)
-  return s ? s.version : null
-}
-
-exports.SemVer = SemVer
-
-function SemVer (version, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-  if (version instanceof SemVer) {
-    if (version.loose === options.loose) {
-      return version
-    } else {
-      version = version.version
-    }
-  } else if (typeof version !== 'string') {
-    throw new TypeError('Invalid Version: ' + version)
-  }
-
-  if (version.length > MAX_LENGTH) {
-    throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
-  }
-
-  if (!(this instanceof SemVer)) {
-    return new SemVer(version, options)
-  }
-
-  debug('SemVer', version, options)
-  this.options = options
-  this.loose = !!options.loose
-
-  var m = version.trim().match(options.loose ? re[LOOSE] : re[FULL])
-
-  if (!m) {
-    throw new TypeError('Invalid Version: ' + version)
-  }
-
-  this.raw = version
-
-  // these are actually numbers
-  this.major = +m[1]
-  this.minor = +m[2]
-  this.patch = +m[3]
-
-  if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
-    throw new TypeError('Invalid major version')
-  }
-
-  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
-    throw new TypeError('Invalid minor version')
-  }
-
-  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
-    throw new TypeError('Invalid patch version')
-  }
-
-  // numberify any prerelease numeric ids
-  if (!m[4]) {
-    this.prerelease = []
-  } else {
-    this.prerelease = m[4].split('.').map(function (id) {
-      if (/^[0-9]+$/.test(id)) {
-        var num = +id
-        if (num >= 0 && num < MAX_SAFE_INTEGER) {
-          return num
-        }
-      }
-      return id
-    })
-  }
-
-  this.build = m[5] ? m[5].split('.') : []
-  this.format()
-}
-
-SemVer.prototype.format = function () {
-  this.version = this.major + '.' + this.minor + '.' + this.patch
-  if (this.prerelease.length) {
-    this.version += '-' + this.prerelease.join('.')
-  }
-  return this.version
-}
-
-SemVer.prototype.toString = function () {
-  return this.version
-}
-
-SemVer.prototype.compare = function (other) {
-  debug('SemVer.compare', this.version, this.options, other)
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  return this.compareMain(other) || this.comparePre(other)
-}
-
-SemVer.prototype.compareMain = function (other) {
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  return compareIdentifiers(this.major, other.major) ||
-         compareIdentifiers(this.minor, other.minor) ||
-         compareIdentifiers(this.patch, other.patch)
-}
-
-SemVer.prototype.comparePre = function (other) {
-  if (!(other instanceof SemVer)) {
-    other = new SemVer(other, this.options)
-  }
-
-  // NOT having a prerelease is > having one
-  if (this.prerelease.length && !other.prerelease.length) {
-    return -1
-  } else if (!this.prerelease.length && other.prerelease.length) {
-    return 1
-  } else if (!this.prerelease.length && !other.prerelease.length) {
-    return 0
-  }
-
-  var i = 0
-  do {
-    var a = this.prerelease[i]
-    var b = other.prerelease[i]
-    debug('prerelease compare', i, a, b)
-    if (a === undefined && b === undefined) {
-      return 0
-    } else if (b === undefined) {
-      return 1
-    } else if (a === undefined) {
-      return -1
-    } else if (a === b) {
-      continue
-    } else {
-      return compareIdentifiers(a, b)
-    }
-  } while (++i)
-}
-
-// preminor will bump the version up to the next minor release, and immediately
-// down to pre-release. premajor and prepatch work the same way.
-SemVer.prototype.inc = function (release, identifier) {
-  switch (release) {
-    case 'premajor':
-      this.prerelease.length = 0
-      this.patch = 0
-      this.minor = 0
-      this.major++
-      this.inc('pre', identifier)
-      break
-    case 'preminor':
-      this.prerelease.length = 0
-      this.patch = 0
-      this.minor++
-      this.inc('pre', identifier)
-      break
-    case 'prepatch':
-      // If this is already a prerelease, it will bump to the next version
-      // drop any prereleases that might already exist, since they are not
-      // relevant at this point.
-      this.prerelease.length = 0
-      this.inc('patch', identifier)
-      this.inc('pre', identifier)
-      break
-    // If the input is a non-prerelease version, this acts the same as
-    // prepatch.
-    case 'prerelease':
-      if (this.prerelease.length === 0) {
-        this.inc('patch', identifier)
-      }
-      this.inc('pre', identifier)
-      break
-
-    case 'major':
-      // If this is a pre-major version, bump up to the same major version.
-      // Otherwise increment major.
-      // 1.0.0-5 bumps to 1.0.0
-      // 1.1.0 bumps to 2.0.0
-      if (this.minor !== 0 ||
-          this.patch !== 0 ||
-          this.prerelease.length === 0) {
-        this.major++
-      }
-      this.minor = 0
-      this.patch = 0
-      this.prerelease = []
-      break
-    case 'minor':
-      // If this is a pre-minor version, bump up to the same minor version.
-      // Otherwise increment minor.
-      // 1.2.0-5 bumps to 1.2.0
-      // 1.2.1 bumps to 1.3.0
-      if (this.patch !== 0 || this.prerelease.length === 0) {
-        this.minor++
-      }
-      this.patch = 0
-      this.prerelease = []
-      break
-    case 'patch':
-      // If this is not a pre-release version, it will increment the patch.
-      // If it is a pre-release it will bump up to the same patch version.
-      // 1.2.0-5 patches to 1.2.0
-      // 1.2.0 patches to 1.2.1
-      if (this.prerelease.length === 0) {
-        this.patch++
-      }
-      this.prerelease = []
-      break
-    // This probably shouldn't be used publicly.
-    // 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
-    case 'pre':
-      if (this.prerelease.length === 0) {
-        this.prerelease = [0]
-      } else {
-        var i = this.prerelease.length
-        while (--i >= 0) {
-          if (typeof this.prerelease[i] === 'number') {
-            this.prerelease[i]++
-            i = -2
-          }
-        }
-        if (i === -1) {
-          // didn't increment anything
-          this.prerelease.push(0)
-        }
-      }
-      if (identifier) {
-        // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
-        // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
-        if (this.prerelease[0] === identifier) {
-          if (isNaN(this.prerelease[1])) {
-            this.prerelease = [identifier, 0]
-          }
-        } else {
-          this.prerelease = [identifier, 0]
-        }
-      }
-      break
-
-    default:
-      throw new Error('invalid increment argument: ' + release)
-  }
-  this.format()
-  this.raw = this.version
-  return this
-}
-
-exports.inc = inc
-function inc (version, release, loose, identifier) {
-  if (typeof (loose) === 'string') {
-    identifier = loose
-    loose = undefined
-  }
-
-  try {
-    return new SemVer(version, loose).inc(release, identifier).version
-  } catch (er) {
-    return null
-  }
-}
-
-exports.diff = diff
-function diff (version1, version2) {
-  if (eq(version1, version2)) {
-    return null
-  } else {
-    var v1 = parse(version1)
-    var v2 = parse(version2)
-    var prefix = ''
-    if (v1.prerelease.length || v2.prerelease.length) {
-      prefix = 'pre'
-      var defaultResult = 'prerelease'
-    }
-    for (var key in v1) {
-      if (key === 'major' || key === 'minor' || key === 'patch') {
-        if (v1[key] !== v2[key]) {
-          return prefix + key
-        }
-      }
-    }
-    return defaultResult // may be undefined
-  }
-}
-
-exports.compareIdentifiers = compareIdentifiers
-
-var numeric = /^[0-9]+$/
-function compareIdentifiers (a, b) {
-  var anum = numeric.test(a)
-  var bnum = numeric.test(b)
-
-  if (anum && bnum) {
-    a = +a
-    b = +b
-  }
-
-  return a === b ? 0
-    : (anum && !bnum) ? -1
-    : (bnum && !anum) ? 1
-    : a < b ? -1
-    : 1
-}
-
-exports.rcompareIdentifiers = rcompareIdentifiers
-function rcompareIdentifiers (a, b) {
-  return compareIdentifiers(b, a)
-}
-
-exports.major = major
-function major (a, loose) {
-  return new SemVer(a, loose).major
-}
-
-exports.minor = minor
-function minor (a, loose) {
-  return new SemVer(a, loose).minor
-}
-
-exports.patch = patch
-function patch (a, loose) {
-  return new SemVer(a, loose).patch
-}
-
-exports.compare = compare
-function compare (a, b, loose) {
-  return new SemVer(a, loose).compare(new SemVer(b, loose))
-}
-
-exports.compareLoose = compareLoose
-function compareLoose (a, b) {
-  return compare(a, b, true)
-}
-
-exports.rcompare = rcompare
-function rcompare (a, b, loose) {
-  return compare(b, a, loose)
-}
-
-exports.sort = sort
-function sort (list, loose) {
-  return list.sort(function (a, b) {
-    return exports.compare(a, b, loose)
-  })
-}
-
-exports.rsort = rsort
-function rsort (list, loose) {
-  return list.sort(function (a, b) {
-    return exports.rcompare(a, b, loose)
-  })
-}
-
-exports.gt = gt
-function gt (a, b, loose) {
-  return compare(a, b, loose) > 0
-}
-
-exports.lt = lt
-function lt (a, b, loose) {
-  return compare(a, b, loose) < 0
-}
-
-exports.eq = eq
-function eq (a, b, loose) {
-  return compare(a, b, loose) === 0
-}
-
-exports.neq = neq
-function neq (a, b, loose) {
-  return compare(a, b, loose) !== 0
-}
-
-exports.gte = gte
-function gte (a, b, loose) {
-  return compare(a, b, loose) >= 0
-}
-
-exports.lte = lte
-function lte (a, b, loose) {
-  return compare(a, b, loose) <= 0
-}
-
-exports.cmp = cmp
-function cmp (a, op, b, loose) {
-  switch (op) {
-    case '===':
-      if (typeof a === 'object')
-        a = a.version
-      if (typeof b === 'object')
-        b = b.version
-      return a === b
-
-    case '!==':
-      if (typeof a === 'object')
-        a = a.version
-      if (typeof b === 'object')
-        b = b.version
-      return a !== b
-
-    case '':
-    case '=':
-    case '==':
-      return eq(a, b, loose)
-
-    case '!=':
-      return neq(a, b, loose)
-
-    case '>':
-      return gt(a, b, loose)
-
-    case '>=':
-      return gte(a, b, loose)
-
-    case '<':
-      return lt(a, b, loose)
-
-    case '<=':
-      return lte(a, b, loose)
-
-    default:
-      throw new TypeError('Invalid operator: ' + op)
-  }
-}
-
-exports.Comparator = Comparator
-function Comparator (comp, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (comp instanceof Comparator) {
-    if (comp.loose === !!options.loose) {
-      return comp
-    } else {
-      comp = comp.value
-    }
-  }
-
-  if (!(this instanceof Comparator)) {
-    return new Comparator(comp, options)
-  }
-
-  debug('comparator', comp, options)
-  this.options = options
-  this.loose = !!options.loose
-  this.parse(comp)
-
-  if (this.semver === ANY) {
-    this.value = ''
-  } else {
-    this.value = this.operator + this.semver.version
-  }
-
-  debug('comp', this)
-}
-
-var ANY = {}
-Comparator.prototype.parse = function (comp) {
-  var r = this.options.loose ? re[COMPARATORLOOSE] : re[COMPARATOR]
-  var m = comp.match(r)
-
-  if (!m) {
-    throw new TypeError('Invalid comparator: ' + comp)
-  }
-
-  this.operator = m[1]
-  if (this.operator === '=') {
-    this.operator = ''
-  }
-
-  // if it literally is just '>' or '' then allow anything.
-  if (!m[2]) {
-    this.semver = ANY
-  } else {
-    this.semver = new SemVer(m[2], this.options.loose)
-  }
-}
-
-Comparator.prototype.toString = function () {
-  return this.value
-}
-
-Comparator.prototype.test = function (version) {
-  debug('Comparator.test', version, this.options.loose)
-
-  if (this.semver === ANY) {
-    return true
-  }
-
-  if (typeof version === 'string') {
-    version = new SemVer(version, this.options)
-  }
-
-  return cmp(version, this.operator, this.semver, this.options)
-}
-
-Comparator.prototype.intersects = function (comp, options) {
-  if (!(comp instanceof Comparator)) {
-    throw new TypeError('a Comparator is required')
-  }
-
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  var rangeTmp
-
-  if (this.operator === '') {
-    rangeTmp = new Range(comp.value, options)
-    return satisfies(this.value, rangeTmp, options)
-  } else if (comp.operator === '') {
-    rangeTmp = new Range(this.value, options)
-    return satisfies(comp.semver, rangeTmp, options)
-  }
-
-  var sameDirectionIncreasing =
-    (this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '>=' || comp.operator === '>')
-  var sameDirectionDecreasing =
-    (this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '<=' || comp.operator === '<')
-  var sameSemVer = this.semver.version === comp.semver.version
-  var differentDirectionsInclusive =
-    (this.operator === '>=' || this.operator === '<=') &&
-    (comp.operator === '>=' || comp.operator === '<=')
-  var oppositeDirectionsLessThan =
-    cmp(this.semver, '<', comp.semver, options) &&
-    ((this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '<=' || comp.operator === '<'))
-  var oppositeDirectionsGreaterThan =
-    cmp(this.semver, '>', comp.semver, options) &&
-    ((this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '>=' || comp.operator === '>'))
-
-  return sameDirectionIncreasing || sameDirectionDecreasing ||
-    (sameSemVer && differentDirectionsInclusive) ||
-    oppositeDirectionsLessThan || oppositeDirectionsGreaterThan
-}
-
-exports.Range = Range
-function Range (range, options) {
-  if (!options || typeof options !== 'object') {
-    options = {
-      loose: !!options,
-      includePrerelease: false
-    }
-  }
-
-  if (range instanceof Range) {
-    if (range.loose === !!options.loose &&
-        range.includePrerelease === !!options.includePrerelease) {
-      return range
-    } else {
-      return new Range(range.raw, options)
-    }
-  }
-
-  if (range instanceof Comparator) {
-    return new Range(range.value, options)
-  }
-
-  if (!(this instanceof Range)) {
-    return new Range(range, options)
-  }
-
-  this.options = options
-  this.loose = !!options.loose
-  this.includePrerelease = !!options.includePrerelease
-
-  // First, split based on boolean or ||
-  this.raw = range
-  this.set = range.split(/\s*\|\|\s*/).map(function (range) {
-    return this.parseRange(range.trim())
-  }, this).filter(function (c) {
-    // throw out any that are not relevant for whatever reason
-    return c.length
-  })
-
-  if (!this.set.length) {
-    throw new TypeError('Invalid SemVer Range: ' + range)
-  }
-
-  this.format()
-}
-
-Range.prototype.format = function () {
-  this.range = this.set.map(function (comps) {
-    return comps.join(' ').trim()
-  }).join('||').trim()
-  return this.range
-}
-
-Range.prototype.toString = function () {
-  return this.range
-}
-
-Range.prototype.parseRange = function (range) {
-  var loose = this.options.loose
-  range = range.trim()
-  // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
-  var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE]
-  range = range.replace(hr, hyphenReplace)
-  debug('hyphen replace', range)
-  // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
-  range = range.replace(re[COMPARATORTRIM], comparatorTrimReplace)
-  debug('comparator trim', range, re[COMPARATORTRIM])
-
-  // `~ 1.2.3` => `~1.2.3`
-  range = range.replace(re[TILDETRIM], tildeTrimReplace)
-
-  // `^ 1.2.3` => `^1.2.3`
-  range = range.replace(re[CARETTRIM], caretTrimReplace)
-
-  // normalize spaces
-  range = range.split(/\s+/).join(' ')
-
-  // At this point, the range is completely trimmed and
-  // ready to be split into comparators.
-
-  var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR]
-  var set = range.split(' ').map(function (comp) {
-    return parseComparator(comp, this.options)
-  }, this).join(' ').split(/\s+/)
-  if (this.options.loose) {
-    // in loose mode, throw out any that are not valid comparators
-    set = set.filter(function (comp) {
-      return !!comp.match(compRe)
-    })
-  }
-  set = set.map(function (comp) {
-    return new Comparator(comp, this.options)
-  }, this)
-
-  return set
-}
-
-Range.prototype.intersects = function (range, options) {
-  if (!(range instanceof Range)) {
-    throw new TypeError('a Range is required')
-  }
-
-  return this.set.some(function (thisComparators) {
-    return thisComparators.every(function (thisComparator) {
-      return range.set.some(function (rangeComparators) {
-        return rangeComparators.every(function (rangeComparator) {
-          return thisComparator.intersects(rangeComparator, options)
-        })
-      })
-    })
-  })
-}
-
-// Mostly just for testing and legacy API reasons
-exports.toComparators = toComparators
-function toComparators (range, options) {
-  return new Range(range, options).set.map(function (comp) {
-    return comp.map(function (c) {
-      return c.value
-    }).join(' ').trim().split(' ')
-  })
-}
-
-// comprised of xranges, tildes, stars, and gtlt's at this point.
-// already replaced the hyphen ranges
-// turn into a set of JUST comparators.
-function parseComparator (comp, options) {
-  debug('comp', comp, options)
-  comp = replaceCarets(comp, options)
-  debug('caret', comp)
-  comp = replaceTildes(comp, options)
-  debug('tildes', comp)
-  comp = replaceXRanges(comp, options)
-  debug('xrange', comp)
-  comp = replaceStars(comp, options)
-  debug('stars', comp)
-  return comp
-}
-
-function isX (id) {
-  return !id || id.toLowerCase() === 'x' || id === '*'
-}
-
-// ~, ~> --> * (any, kinda silly)
-// ~2, ~2.x, ~2.x.x, ~>2, ~>2.x ~>2.x.x --> >=2.0.0 <3.0.0
-// ~2.0, ~2.0.x, ~>2.0, ~>2.0.x --> >=2.0.0 <2.1.0
-// ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
-// ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
-// ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
-function replaceTildes (comp, options) {
-  return comp.trim().split(/\s+/).map(function (comp) {
-    return replaceTilde(comp, options)
-  }).join(' ')
-}
-
-function replaceTilde (comp, options) {
-  var r = options.loose ? re[TILDELOOSE] : re[TILDE]
-  return comp.replace(r, function (_, M, m, p, pr) {
-    debug('tilde', comp, _, M, m, p, pr)
-    var ret
-
-    if (isX(M)) {
-      ret = ''
-    } else if (isX(m)) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (isX(p)) {
-      // ~1.2 == >=1.2.0 <1.3.0
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-    } else if (pr) {
-      debug('replaceTilde pr', pr)
-      ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-            ' <' + M + '.' + (+m + 1) + '.0'
-    } else {
-      // ~1.2.3 == >=1.2.3 <1.3.0
-      ret = '>=' + M + '.' + m + '.' + p +
-            ' <' + M + '.' + (+m + 1) + '.0'
-    }
-
-    debug('tilde return', ret)
-    return ret
-  })
-}
-
-// ^ --> * (any, kinda silly)
-// ^2, ^2.x, ^2.x.x --> >=2.0.0 <3.0.0
-// ^2.0, ^2.0.x --> >=2.0.0 <3.0.0
-// ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
-// ^1.2.3 --> >=1.2.3 <2.0.0
-// ^1.2.0 --> >=1.2.0 <2.0.0
-function replaceCarets (comp, options) {
-  return comp.trim().split(/\s+/).map(function (comp) {
-    return replaceCaret(comp, options)
-  }).join(' ')
-}
-
-function replaceCaret (comp, options) {
-  debug('caret', comp, options)
-  var r = options.loose ? re[CARETLOOSE] : re[CARET]
-  return comp.replace(r, function (_, M, m, p, pr) {
-    debug('caret', comp, _, M, m, p, pr)
-    var ret
-
-    if (isX(M)) {
-      ret = ''
-    } else if (isX(m)) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (isX(p)) {
-      if (M === '0') {
-        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-      } else {
-        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0'
-      }
-    } else if (pr) {
-      debug('replaceCaret pr', pr)
-      if (M === '0') {
-        if (m === '0') {
-          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-                ' <' + M + '.' + m + '.' + (+p + 1)
-        } else {
-          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-                ' <' + M + '.' + (+m + 1) + '.0'
-        }
-      } else {
-        ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
-              ' <' + (+M + 1) + '.0.0'
-      }
-    } else {
-      debug('no pr')
-      if (M === '0') {
-        if (m === '0') {
-          ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + m + '.' + (+p + 1)
-        } else {
-          ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + (+m + 1) + '.0'
-        }
-      } else {
-        ret = '>=' + M + '.' + m + '.' + p +
-              ' <' + (+M + 1) + '.0.0'
-      }
-    }
-
-    debug('caret return', ret)
-    return ret
-  })
-}
-
-function replaceXRanges (comp, options) {
-  debug('replaceXRanges', comp, options)
-  return comp.split(/\s+/).map(function (comp) {
-    return replaceXRange(comp, options)
-  }).join(' ')
-}
-
-function replaceXRange (comp, options) {
-  comp = comp.trim()
-  var r = options.loose ? re[XRANGELOOSE] : re[XRANGE]
-  return comp.replace(r, function (ret, gtlt, M, m, p, pr) {
-    debug('xRange', comp, ret, gtlt, M, m, p, pr)
-    var xM = isX(M)
-    var xm = xM || isX(m)
-    var xp = xm || isX(p)
-    var anyX = xp
-
-    if (gtlt === '=' && anyX) {
-      gtlt = ''
-    }
-
-    if (xM) {
-      if (gtlt === '>' || gtlt === '<') {
-        // nothing is allowed
-        ret = '<0.0.0'
-      } else {
-        // nothing is forbidden
-        ret = '*'
-      }
-    } else if (gtlt && anyX) {
-      // we know patch is an x, because we have any x at all.
-      // replace X with 0
-      if (xm) {
-        m = 0
-      }
-      p = 0
-
-      if (gtlt === '>') {
-        // >1 => >=2.0.0
-        // >1.2 => >=1.3.0
-        // >1.2.3 => >= 1.2.4
-        gtlt = '>='
-        if (xm) {
-          M = +M + 1
-          m = 0
-          p = 0
-        } else {
-          m = +m + 1
-          p = 0
-        }
-      } else if (gtlt === '<=') {
-        // <=0.7.x is actually <0.8.0, since any 0.7.x should
-        // pass.  Similarly, <=7.x is actually <8.0.0, etc.
-        gtlt = '<'
-        if (xm) {
-          M = +M + 1
-        } else {
-          m = +m + 1
-        }
-      }
-
-      ret = gtlt + M + '.' + m + '.' + p
-    } else if (xm) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
-    } else if (xp) {
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
-    }
-
-    debug('xRange return', ret)
-
-    return ret
-  })
-}
-
-// Because * is AND-ed with everything else in the comparator,
-// and '' means "any version", just remove the *s entirely.
-function replaceStars (comp, options) {
-  debug('replaceStars', comp, options)
-  // Looseness is ignored here.  star is always as loose as it gets!
-  return comp.trim().replace(re[STAR], '')
-}
-
-// This function is passed to string.replace(re[HYPHENRANGE])
-// M, m, patch, prerelease, build
-// 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
-// 1.2.3 - 3.4 => >=1.2.0 <3.5.0 Any 3.4.x will do
-// 1.2 - 3.4 => >=1.2.0 <3.5.0
-function hyphenReplace ($0,
-  from, fM, fm, fp, fpr, fb,
-  to, tM, tm, tp, tpr, tb) {
-  if (isX(fM)) {
-    from = ''
-  } else if (isX(fm)) {
-    from = '>=' + fM + '.0.0'
-  } else if (isX(fp)) {
-    from = '>=' + fM + '.' + fm + '.0'
-  } else {
-    from = '>=' + from
-  }
-
-  if (isX(tM)) {
-    to = ''
-  } else if (isX(tm)) {
-    to = '<' + (+tM + 1) + '.0.0'
-  } else if (isX(tp)) {
-    to = '<' + tM + '.' + (+tm + 1) + '.0'
-  } else if (tpr) {
-    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr
-  } else {
-    to = '<=' + to
-  }
-
-  return (from + ' ' + to).trim()
-}
-
-// if ANY of the sets match ALL of its comparators, then pass
-Range.prototype.test = function (version) {
-  if (!version) {
-    return false
-  }
-
-  if (typeof version === 'string') {
-    version = new SemVer(version, this.options)
-  }
-
-  for (var i = 0; i < this.set.length; i++) {
-    if (testSet(this.set[i], version, this.options)) {
-      return true
-    }
-  }
-  return false
-}
-
-function testSet (set, version, options) {
-  for (var i = 0; i < set.length; i++) {
-    if (!set[i].test(version)) {
-      return false
-    }
-  }
-
-  if (version.prerelease.length && !options.includePrerelease) {
-    // Find the set of versions that are allowed to have prereleases
-    // For example, ^1.2.3-pr.1 desugars to >=1.2.3-pr.1 <2.0.0
-    // That should allow `1.2.3-pr.2` to pass.
-    // However, `1.2.4-alpha.notready` should NOT be allowed,
-    // even though it's within the range set by the comparators.
-    for (i = 0; i < set.length; i++) {
-      debug(set[i].semver)
-      if (set[i].semver === ANY) {
-        continue
-      }
-
-      if (set[i].semver.prerelease.length > 0) {
-        var allowed = set[i].semver
-        if (allowed.major === version.major &&
-            allowed.minor === version.minor &&
-            allowed.patch === version.patch) {
-          return true
-        }
-      }
-    }
-
-    // Version has a -pre, but it's not one of the ones we like.
-    return false
-  }
-
-  return true
-}
-
-exports.satisfies = satisfies
-function satisfies (version, range, options) {
-  try {
-    range = new Range(range, options)
-  } catch (er) {
-    return false
-  }
-  return range.test(version)
-}
-
-exports.maxSatisfying = maxSatisfying
-function maxSatisfying (versions, range, options) {
-  var max = null
-  var maxSV = null
-  try {
-    var rangeObj = new Range(range, options)
-  } catch (er) {
-    return null
-  }
-  versions.forEach(function (v) {
-    if (rangeObj.test(v)) {
-      // satisfies(v, range, options)
-      if (!max || maxSV.compare(v) === -1) {
-        // compare(max, v, true)
-        max = v
-        maxSV = new SemVer(max, options)
-      }
-    }
-  })
-  return max
-}
-
-exports.minSatisfying = minSatisfying
-function minSatisfying (versions, range, options) {
-  var min = null
-  var minSV = null
-  try {
-    var rangeObj = new Range(range, options)
-  } catch (er) {
-    return null
-  }
-  versions.forEach(function (v) {
-    if (rangeObj.test(v)) {
-      // satisfies(v, range, options)
-      if (!min || minSV.compare(v) === 1) {
-        // compare(min, v, true)
-        min = v
-        minSV = new SemVer(min, options)
-      }
-    }
-  })
-  return min
-}
-
-exports.minVersion = minVersion
-function minVersion (range, loose) {
-  range = new Range(range, loose)
-
-  var minver = new SemVer('0.0.0')
-  if (range.test(minver)) {
-    return minver
-  }
-
-  minver = new SemVer('0.0.0-0')
-  if (range.test(minver)) {
-    return minver
-  }
-
-  minver = null
-  for (var i = 0; i < range.set.length; ++i) {
-    var comparators = range.set[i]
-
-    comparators.forEach(function (comparator) {
-      // Clone to avoid manipulating the comparator's semver object.
-      var compver = new SemVer(comparator.semver.version)
-      switch (comparator.operator) {
-        case '>':
-          if (compver.prerelease.length === 0) {
-            compver.patch++
-          } else {
-            compver.prerelease.push(0)
-          }
-          compver.raw = compver.format()
-          /* fallthrough */
-        case '':
-        case '>=':
-          if (!minver || gt(minver, compver)) {
-            minver = compver
-          }
-          break
-        case '<':
-        case '<=':
-          /* Ignore maximum versions */
-          break
-        /* istanbul ignore next */
-        default:
-          throw new Error('Unexpected operation: ' + comparator.operator)
-      }
-    })
-  }
-
-  if (minver && range.test(minver)) {
-    return minver
-  }
-
-  return null
-}
-
-exports.validRange = validRange
-function validRange (range, options) {
-  try {
-    // Return '*' instead of '' so that truthiness works.
-    // This will throw if it's invalid anyway
-    return new Range(range, options).range || '*'
-  } catch (er) {
-    return null
-  }
-}
-
-// Determine if version is less than all the versions possible in the range
-exports.ltr = ltr
-function ltr (version, range, options) {
-  return outside(version, range, '<', options)
-}
-
-// Determine if version is greater than all the versions possible in the range.
-exports.gtr = gtr
-function gtr (version, range, options) {
-  return outside(version, range, '>', options)
-}
-
-exports.outside = outside
-function outside (version, range, hilo, options) {
-  version = new SemVer(version, options)
-  range = new Range(range, options)
-
-  var gtfn, ltefn, ltfn, comp, ecomp
-  switch (hilo) {
-    case '>':
-      gtfn = gt
-      ltefn = lte
-      ltfn = lt
-      comp = '>'
-      ecomp = '>='
-      break
-    case '<':
-      gtfn = lt
-      ltefn = gte
-      ltfn = gt
-      comp = '<'
-      ecomp = '<='
-      break
-    default:
-      throw new TypeError('Must provide a hilo val of "<" or ">"')
-  }
-
-  // If it satisifes the range it is not outside
-  if (satisfies(version, range, options)) {
-    return false
-  }
-
-  // From now on, variable terms are as if we're in "gtr" mode.
-  // but note that everything is flipped for the "ltr" function.
-
-  for (var i = 0; i < range.set.length; ++i) {
-    var comparators = range.set[i]
-
-    var high = null
-    var low = null
-
-    comparators.forEach(function (comparator) {
-      if (comparator.semver === ANY) {
-        comparator = new Comparator('>=0.0.0')
-      }
-      high = high || comparator
-      low = low || comparator
-      if (gtfn(comparator.semver, high.semver, options)) {
-        high = comparator
-      } else if (ltfn(comparator.semver, low.semver, options)) {
-        low = comparator
-      }
-    })
-
-    // If the edge version comparator has a operator then our version
-    // isn't outside it
-    if (high.operator === comp || high.operator === ecomp) {
-      return false
-    }
-
-    // If the lowest version comparator has an operator and our version
-    // is less than it then it isn't higher than the range
-    if ((!low.operator || low.operator === comp) &&
-        ltefn(version, low.semver)) {
-      return false
-    } else if (low.operator === ecomp && ltfn(version, low.semver)) {
-      return false
-    }
-  }
-  return true
-}
-
-exports.prerelease = prerelease
-function prerelease (version, options) {
-  var parsed = parse(version, options)
-  return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
-}
-
-exports.intersects = intersects
-function intersects (r1, r2, options) {
-  r1 = new Range(r1, options)
-  r2 = new Range(r2, options)
-  return r1.intersects(r2)
-}
-
-exports.coerce = coerce
-function coerce (version) {
-  if (version instanceof SemVer) {
-    return version
-  }
-
-  if (typeof version !== 'string') {
-    return null
-  }
-
-  var match = version.match(re[COERCE])
-
-  if (match == null) {
-    return null
-  }
-
-  return parse(match[1] +
-    '.' + (match[2] || '0') +
-    '.' + (match[3] || '0'))
-}
-
-}).call(this,require('_process'))
-},{"_process":117}],171:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 (function (Buffer){
-var timespan = require('./lib/timespan');
-var PS_SUPPORTED = require('./lib/psSupported');
-var jws = require('jws');
-var includes = require('lodash.includes');
-var isBoolean = require('lodash.isboolean');
-var isInteger = require('lodash.isinteger');
-var isNumber = require('lodash.isnumber');
-var isPlainObject = require('lodash.isplainobject');
-var isString = require('lodash.isstring');
-var once = require('lodash.once');
+const crypto = require('crypto');
 
-var SUPPORTED_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512', 'HS256', 'HS384', 'HS512', 'none']
-if (PS_SUPPORTED) {
-  SUPPORTED_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
-}
+const algorithm = 'aes-256-gcm';
+const ivLength = 16;
+const saltLength = 64;
+const tagLength = 16;
+const tagPosition = saltLength + ivLength;
+const encryptedPosition = tagPosition + tagLength;
 
-var sign_options_schema = {
-  expiresIn: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"expiresIn" should be a number of seconds or string representing a timespan' },
-  notBefore: { isValid: function(value) { return isInteger(value) || (isString(value) && value); }, message: '"notBefore" should be a number of seconds or string representing a timespan' },
-  audience: { isValid: function(value) { return isString(value) || Array.isArray(value); }, message: '"audience" must be a string or array' },
-  algorithm: { isValid: includes.bind(null, SUPPORTED_ALGS), message: '"algorithm" must be a valid string enum value' },
-  header: { isValid: isPlainObject, message: '"header" must be an object' },
-  encoding: { isValid: isString, message: '"encoding" must be a string' },
-  issuer: { isValid: isString, message: '"issuer" must be a string' },
-  subject: { isValid: isString, message: '"subject" must be a string' },
-  jwtid: { isValid: isString, message: '"jwtid" must be a string' },
-  noTimestamp: { isValid: isBoolean, message: '"noTimestamp" must be a boolean' },
-  keyid: { isValid: isString, message: '"keyid" must be a string' },
-  mutatePayload: { isValid: isBoolean, message: '"mutatePayload" must be a boolean' }
-};
+function Cryptr(secret) {
+    if (!secret || typeof secret !== 'string') {
+        throw new Error('Cryptr: secret must be a non-0-length string');
+    }
 
-var registered_claims_schema = {
-  iat: { isValid: isNumber, message: '"iat" should be a number of seconds' },
-  exp: { isValid: isNumber, message: '"exp" should be a number of seconds' },
-  nbf: { isValid: isNumber, message: '"nbf" should be a number of seconds' }
-};
+    function getKey(salt) {
+        return crypto.pbkdf2Sync(secret, salt, 100000, 32, 'sha512');
+    }
 
-function validate(schema, allowUnknown, object, parameterName) {
-  if (!isPlainObject(object)) {
-    throw new Error('Expected "' + parameterName + '" to be a plain object.');
-  }
-  Object.keys(object)
-    .forEach(function(key) {
-      var validator = schema[key];
-      if (!validator) {
-        if (!allowUnknown) {
-          throw new Error('"' + key + '" is not allowed in "' + parameterName + '"');
+    this.encrypt = function encrypt(value) {
+        if (value == null) {
+            throw new Error('value must not be null or undefined');
         }
-        return;
-      }
-      if (!validator.isValid(object[key])) {
-        throw new Error(validator.message);
-      }
-    });
-}
 
-function validateOptions(options) {
-  return validate(sign_options_schema, false, options, 'options');
-}
+        const iv = crypto.randomBytes(ivLength);
+        const salt = crypto.randomBytes(saltLength);
 
-function validatePayload(payload) {
-  return validate(registered_claims_schema, true, payload, 'payload');
-}
+        const key = getKey(salt);
 
-var options_to_payload = {
-  'audience': 'aud',
-  'issuer': 'iss',
-  'subject': 'sub',
-  'jwtid': 'jti'
-};
+        const cipher = crypto.createCipheriv(algorithm, key, iv);
+        const encrypted = Buffer.concat([cipher.update(String(value), 'utf8'), cipher.final()]);
 
-var options_for_objects = [
-  'expiresIn',
-  'notBefore',
-  'noTimestamp',
-  'audience',
-  'issuer',
-  'subject',
-  'jwtid',
-];
+        const tag = cipher.getAuthTag();
 
-module.exports = function (payload, secretOrPrivateKey, options, callback) {
-  if (typeof options === 'function') {
-    callback = options;
-    options = {};
-  } else {
-    options = options || {};
-  }
-
-  var isObjectPayload = typeof payload === 'object' &&
-                        !Buffer.isBuffer(payload);
-
-  var header = Object.assign({
-    alg: options.algorithm || 'HS256',
-    typ: isObjectPayload ? 'JWT' : undefined,
-    kid: options.keyid
-  }, options.header);
-
-  function failure(err) {
-    if (callback) {
-      return callback(err);
-    }
-    throw err;
-  }
-
-  if (!secretOrPrivateKey && options.algorithm !== 'none') {
-    return failure(new Error('secretOrPrivateKey must have a value'));
-  }
-
-  if (typeof payload === 'undefined') {
-    return failure(new Error('payload is required'));
-  } else if (isObjectPayload) {
-    try {
-      validatePayload(payload);
-    }
-    catch (error) {
-      return failure(error);
-    }
-    if (!options.mutatePayload) {
-      payload = Object.assign({},payload);
-    }
-  } else {
-    var invalid_options = options_for_objects.filter(function (opt) {
-      return typeof options[opt] !== 'undefined';
-    });
-
-    if (invalid_options.length > 0) {
-      return failure(new Error('invalid ' + invalid_options.join(',') + ' option for ' + (typeof payload ) + ' payload'));
-    }
-  }
-
-  if (typeof payload.exp !== 'undefined' && typeof options.expiresIn !== 'undefined') {
-    return failure(new Error('Bad "options.expiresIn" option the payload already has an "exp" property.'));
-  }
-
-  if (typeof payload.nbf !== 'undefined' && typeof options.notBefore !== 'undefined') {
-    return failure(new Error('Bad "options.notBefore" option the payload already has an "nbf" property.'));
-  }
-
-  try {
-    validateOptions(options);
-  }
-  catch (error) {
-    return failure(error);
-  }
-
-  var timestamp = payload.iat || Math.floor(Date.now() / 1000);
-
-  if (options.noTimestamp) {
-    delete payload.iat;
-  } else if (isObjectPayload) {
-    payload.iat = timestamp;
-  }
-
-  if (typeof options.notBefore !== 'undefined') {
-    try {
-      payload.nbf = timespan(options.notBefore, timestamp);
-    }
-    catch (err) {
-      return failure(err);
-    }
-    if (typeof payload.nbf === 'undefined') {
-      return failure(new Error('"notBefore" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
-    }
-  }
-
-  if (typeof options.expiresIn !== 'undefined' && typeof payload === 'object') {
-    try {
-      payload.exp = timespan(options.expiresIn, timestamp);
-    }
-    catch (err) {
-      return failure(err);
-    }
-    if (typeof payload.exp === 'undefined') {
-      return failure(new Error('"expiresIn" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
-    }
-  }
-
-  Object.keys(options_to_payload).forEach(function (key) {
-    var claim = options_to_payload[key];
-    if (typeof options[key] !== 'undefined') {
-      if (typeof payload[claim] !== 'undefined') {
-        return failure(new Error('Bad "options.' + key + '" option. The payload already has an "' + claim + '" property.'));
-      }
-      payload[claim] = options[key];
-    }
-  });
-
-  var encoding = options.encoding || 'utf8';
-
-  if (typeof callback === 'function') {
-    callback = callback && once(callback);
-
-    jws.createSign({
-      header: header,
-      privateKey: secretOrPrivateKey,
-      payload: payload,
-      encoding: encoding
-    }).once('error', callback)
-      .once('done', function (signature) {
-        callback(null, signature);
-      });
-  } else {
-    return jws.sign({header: header, payload: payload, secret: secretOrPrivateKey, encoding: encoding});
-  }
-};
-
-}).call(this,{"isBuffer":require("C:/Users/AJ/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js")})
-},{"./lib/psSupported":167,"./lib/timespan":168,"C:/Users/AJ/AppData/Roaming/npm/node_modules/browserify/node_modules/is-buffer/index.js":100,"jws":174,"lodash.includes":179,"lodash.isboolean":180,"lodash.isinteger":181,"lodash.isnumber":182,"lodash.isplainobject":183,"lodash.isstring":184,"lodash.once":185}],172:[function(require,module,exports){
-var JsonWebTokenError = require('./lib/JsonWebTokenError');
-var NotBeforeError    = require('./lib/NotBeforeError');
-var TokenExpiredError = require('./lib/TokenExpiredError');
-var decode            = require('./decode');
-var timespan          = require('./lib/timespan');
-var PS_SUPPORTED      = require('./lib/psSupported');
-var jws               = require('jws');
-
-var PUB_KEY_ALGS = ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'];
-var RSA_KEY_ALGS = ['RS256', 'RS384', 'RS512'];
-var HS_ALGS = ['HS256', 'HS384', 'HS512'];
-
-if (PS_SUPPORTED) {
-  PUB_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
-  RSA_KEY_ALGS.splice(3, 0, 'PS256', 'PS384', 'PS512');
-}
-
-module.exports = function (jwtString, secretOrPublicKey, options, callback) {
-  if ((typeof options === 'function') && !callback) {
-    callback = options;
-    options = {};
-  }
-
-  if (!options) {
-    options = {};
-  }
-
-  //clone this object since we are going to mutate it.
-  options = Object.assign({}, options);
-
-  var done;
-
-  if (callback) {
-    done = callback;
-  } else {
-    done = function(err, data) {
-      if (err) throw err;
-      return data;
+        return Buffer.concat([salt, iv, tag, encrypted]).toString('hex');
     };
-  }
 
-  if (options.clockTimestamp && typeof options.clockTimestamp !== 'number') {
-    return done(new JsonWebTokenError('clockTimestamp must be a number'));
-  }
+    this.decrypt = function decrypt(value) {
+        if (value == null) {
+            throw new Error('value must not be null or undefined');
+        }
 
-  if (options.nonce !== undefined && (typeof options.nonce !== 'string' || options.nonce.trim() === '')) {
-    return done(new JsonWebTokenError('nonce must be a non-empty string'));
-  }
+        const stringValue = Buffer.from(String(value), 'hex');
 
-  var clockTimestamp = options.clockTimestamp || Math.floor(Date.now() / 1000);
+        const salt = stringValue.slice(0, saltLength);
+        const iv = stringValue.slice(saltLength, tagPosition);
+        const tag = stringValue.slice(tagPosition, encryptedPosition);
+        const encrypted = stringValue.slice(encryptedPosition);
 
-  if (!jwtString){
-    return done(new JsonWebTokenError('jwt must be provided'));
-  }
+        const key = getKey(salt);
 
-  if (typeof jwtString !== 'string') {
-    return done(new JsonWebTokenError('jwt must be a string'));
-  }
+        const decipher = crypto.createDecipheriv(algorithm, key, iv);
 
-  var parts = jwtString.split('.');
+        decipher.setAuthTag(tag);
 
-  if (parts.length !== 3){
-    return done(new JsonWebTokenError('jwt malformed'));
-  }
-
-  var decodedToken;
-
-  try {
-    decodedToken = decode(jwtString, { complete: true });
-  } catch(err) {
-    return done(err);
-  }
-
-  if (!decodedToken) {
-    return done(new JsonWebTokenError('invalid token'));
-  }
-
-  var header = decodedToken.header;
-  var getSecret;
-
-  if(typeof secretOrPublicKey === 'function') {
-    if(!callback) {
-      return done(new JsonWebTokenError('verify must be called asynchronous if secret or public key is provided as a callback'));
-    }
-
-    getSecret = secretOrPublicKey;
-  }
-  else {
-    getSecret = function(header, secretCallback) {
-      return secretCallback(null, secretOrPublicKey);
+        return decipher.update(encrypted) + decipher.final('utf8');
     };
-  }
-
-  return getSecret(header, function(err, secretOrPublicKey) {
-    if(err) {
-      return done(new JsonWebTokenError('error in secret or public key callback: ' + err.message));
-    }
-
-    var hasSignature = parts[2].trim() !== '';
-
-    if (!hasSignature && secretOrPublicKey){
-      return done(new JsonWebTokenError('jwt signature is required'));
-    }
-
-    if (hasSignature && !secretOrPublicKey) {
-      return done(new JsonWebTokenError('secret or public key must be provided'));
-    }
-
-    if (!hasSignature && !options.algorithms) {
-      options.algorithms = ['none'];
-    }
-
-    if (!options.algorithms) {
-      options.algorithms = ~secretOrPublicKey.toString().indexOf('BEGIN CERTIFICATE') ||
-        ~secretOrPublicKey.toString().indexOf('BEGIN PUBLIC KEY') ? PUB_KEY_ALGS :
-        ~secretOrPublicKey.toString().indexOf('BEGIN RSA PUBLIC KEY') ? RSA_KEY_ALGS : HS_ALGS;
-
-    }
-
-    if (!~options.algorithms.indexOf(decodedToken.header.alg)) {
-      return done(new JsonWebTokenError('invalid algorithm'));
-    }
-
-    var valid;
-
-    try {
-      valid = jws.verify(jwtString, decodedToken.header.alg, secretOrPublicKey);
-    } catch (e) {
-      return done(e);
-    }
-
-    if (!valid) {
-      return done(new JsonWebTokenError('invalid signature'));
-    }
-
-    var payload = decodedToken.payload;
-
-    if (typeof payload.nbf !== 'undefined' && !options.ignoreNotBefore) {
-      if (typeof payload.nbf !== 'number') {
-        return done(new JsonWebTokenError('invalid nbf value'));
-      }
-      if (payload.nbf > clockTimestamp + (options.clockTolerance || 0)) {
-        return done(new NotBeforeError('jwt not active', new Date(payload.nbf * 1000)));
-      }
-    }
-
-    if (typeof payload.exp !== 'undefined' && !options.ignoreExpiration) {
-      if (typeof payload.exp !== 'number') {
-        return done(new JsonWebTokenError('invalid exp value'));
-      }
-      if (clockTimestamp >= payload.exp + (options.clockTolerance || 0)) {
-        return done(new TokenExpiredError('jwt expired', new Date(payload.exp * 1000)));
-      }
-    }
-
-    if (options.audience) {
-      var audiences = Array.isArray(options.audience) ? options.audience : [options.audience];
-      var target = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
-
-      var match = target.some(function (targetAudience) {
-        return audiences.some(function (audience) {
-          return audience instanceof RegExp ? audience.test(targetAudience) : audience === targetAudience;
-        });
-      });
-
-      if (!match) {
-        return done(new JsonWebTokenError('jwt audience invalid. expected: ' + audiences.join(' or ')));
-      }
-    }
-
-    if (options.issuer) {
-      var invalid_issuer =
-              (typeof options.issuer === 'string' && payload.iss !== options.issuer) ||
-              (Array.isArray(options.issuer) && options.issuer.indexOf(payload.iss) === -1);
-
-      if (invalid_issuer) {
-        return done(new JsonWebTokenError('jwt issuer invalid. expected: ' + options.issuer));
-      }
-    }
-
-    if (options.subject) {
-      if (payload.sub !== options.subject) {
-        return done(new JsonWebTokenError('jwt subject invalid. expected: ' + options.subject));
-      }
-    }
-
-    if (options.jwtid) {
-      if (payload.jti !== options.jwtid) {
-        return done(new JsonWebTokenError('jwt jwtid invalid. expected: ' + options.jwtid));
-      }
-    }
-
-    if (options.nonce) {
-      if (payload.nonce !== options.nonce) {
-        return done(new JsonWebTokenError('jwt nonce invalid. expected: ' + options.nonce));
-      }
-    }
-
-    if (options.maxAge) {
-      if (typeof payload.iat !== 'number') {
-        return done(new JsonWebTokenError('iat required when maxAge is specified'));
-      }
-
-      var maxAgeTimestamp = timespan(options.maxAge, payload.iat);
-      if (typeof maxAgeTimestamp === 'undefined') {
-        return done(new JsonWebTokenError('"maxAge" should be a number of seconds or string representing a timespan eg: "1d", "20h", 60'));
-      }
-      if (clockTimestamp >= maxAgeTimestamp + (options.clockTolerance || 0)) {
-        return done(new TokenExpiredError('maxAge exceeded', new Date(maxAgeTimestamp * 1000)));
-      }
-    }
-
-    if (options.complete === true) {
-      var signature = decodedToken.signature;
-
-      return done(null, {
-        header: header,
-        payload: payload,
-        signature: signature
-      });
-    }
-
-    return done(null, payload);
-  });
-};
-
-},{"./decode":162,"./lib/JsonWebTokenError":164,"./lib/NotBeforeError":165,"./lib/TokenExpiredError":166,"./lib/psSupported":167,"./lib/timespan":168,"jws":174}],173:[function(require,module,exports){
-var bufferEqual = require('buffer-equal-constant-time');
-var Buffer = require('safe-buffer').Buffer;
-var crypto = require('crypto');
-var formatEcdsa = require('ecdsa-sig-formatter');
-var util = require('util');
-
-var MSG_INVALID_ALGORITHM = '"%s" is not a valid algorithm.\n  Supported algorithms are:\n  "HS256", "HS384", "HS512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512" and "none".'
-var MSG_INVALID_SECRET = 'secret must be a string or buffer';
-var MSG_INVALID_VERIFIER_KEY = 'key must be a string or a buffer';
-var MSG_INVALID_SIGNER_KEY = 'key must be a string, a buffer or an object';
-
-var supportsKeyObjects = typeof crypto.createPublicKey === 'function';
-if (supportsKeyObjects) {
-  MSG_INVALID_VERIFIER_KEY += ' or a KeyObject';
-  MSG_INVALID_SECRET += 'or a KeyObject';
-}
-
-function checkIsPublicKey(key) {
-  if (Buffer.isBuffer(key)) {
-    return;
-  }
-
-  if (typeof key === 'string') {
-    return;
-  }
-
-  if (!supportsKeyObjects) {
-    throw typeError(MSG_INVALID_VERIFIER_KEY);
-  }
-
-  if (typeof key !== 'object') {
-    throw typeError(MSG_INVALID_VERIFIER_KEY);
-  }
-
-  if (typeof key.type !== 'string') {
-    throw typeError(MSG_INVALID_VERIFIER_KEY);
-  }
-
-  if (typeof key.asymmetricKeyType !== 'string') {
-    throw typeError(MSG_INVALID_VERIFIER_KEY);
-  }
-
-  if (typeof key.export !== 'function') {
-    throw typeError(MSG_INVALID_VERIFIER_KEY);
-  }
-};
-
-function checkIsPrivateKey(key) {
-  if (Buffer.isBuffer(key)) {
-    return;
-  }
-
-  if (typeof key === 'string') {
-    return;
-  }
-
-  if (typeof key === 'object') {
-    return;
-  }
-
-  throw typeError(MSG_INVALID_SIGNER_KEY);
-};
-
-function checkIsSecretKey(key) {
-  if (Buffer.isBuffer(key)) {
-    return;
-  }
-
-  if (typeof key === 'string') {
-    return key;
-  }
-
-  if (!supportsKeyObjects) {
-    throw typeError(MSG_INVALID_SECRET);
-  }
-
-  if (typeof key !== 'object') {
-    throw typeError(MSG_INVALID_SECRET);
-  }
-
-  if (key.type !== 'secret') {
-    throw typeError(MSG_INVALID_SECRET);
-  }
-
-  if (typeof key.export !== 'function') {
-    throw typeError(MSG_INVALID_SECRET);
-  }
-}
-
-function fromBase64(base64) {
-  return base64
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-}
-
-function toBase64(base64url) {
-  base64url = base64url.toString();
-
-  var padding = 4 - base64url.length % 4;
-  if (padding !== 4) {
-    for (var i = 0; i < padding; ++i) {
-      base64url += '=';
-    }
-  }
-
-  return base64url
-    .replace(/\-/g, '+')
-    .replace(/_/g, '/');
-}
-
-function typeError(template) {
-  var args = [].slice.call(arguments, 1);
-  var errMsg = util.format.bind(util, template).apply(null, args);
-  return new TypeError(errMsg);
-}
-
-function bufferOrString(obj) {
-  return Buffer.isBuffer(obj) || typeof obj === 'string';
-}
-
-function normalizeInput(thing) {
-  if (!bufferOrString(thing))
-    thing = JSON.stringify(thing);
-  return thing;
-}
-
-function createHmacSigner(bits) {
-  return function sign(thing, secret) {
-    checkIsSecretKey(secret);
-    thing = normalizeInput(thing);
-    var hmac = crypto.createHmac('sha' + bits, secret);
-    var sig = (hmac.update(thing), hmac.digest('base64'))
-    return fromBase64(sig);
-  }
-}
-
-function createHmacVerifier(bits) {
-  return function verify(thing, signature, secret) {
-    var computedSig = createHmacSigner(bits)(thing, secret);
-    return bufferEqual(Buffer.from(signature), Buffer.from(computedSig));
-  }
-}
-
-function createKeySigner(bits) {
- return function sign(thing, privateKey) {
-    checkIsPrivateKey(privateKey);
-    thing = normalizeInput(thing);
-    // Even though we are specifying "RSA" here, this works with ECDSA
-    // keys as well.
-    var signer = crypto.createSign('RSA-SHA' + bits);
-    var sig = (signer.update(thing), signer.sign(privateKey, 'base64'));
-    return fromBase64(sig);
-  }
-}
-
-function createKeyVerifier(bits) {
-  return function verify(thing, signature, publicKey) {
-    checkIsPublicKey(publicKey);
-    thing = normalizeInput(thing);
-    signature = toBase64(signature);
-    var verifier = crypto.createVerify('RSA-SHA' + bits);
-    verifier.update(thing);
-    return verifier.verify(publicKey, signature, 'base64');
-  }
-}
-
-function createPSSKeySigner(bits) {
-  return function sign(thing, privateKey) {
-    checkIsPrivateKey(privateKey);
-    thing = normalizeInput(thing);
-    var signer = crypto.createSign('RSA-SHA' + bits);
-    var sig = (signer.update(thing), signer.sign({
-      key: privateKey,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
-    }, 'base64'));
-    return fromBase64(sig);
-  }
-}
-
-function createPSSKeyVerifier(bits) {
-  return function verify(thing, signature, publicKey) {
-    checkIsPublicKey(publicKey);
-    thing = normalizeInput(thing);
-    signature = toBase64(signature);
-    var verifier = crypto.createVerify('RSA-SHA' + bits);
-    verifier.update(thing);
-    return verifier.verify({
-      key: publicKey,
-      padding: crypto.constants.RSA_PKCS1_PSS_PADDING,
-      saltLength: crypto.constants.RSA_PSS_SALTLEN_DIGEST
-    }, signature, 'base64');
-  }
-}
-
-function createECDSASigner(bits) {
-  var inner = createKeySigner(bits);
-  return function sign() {
-    var signature = inner.apply(null, arguments);
-    signature = formatEcdsa.derToJose(signature, 'ES' + bits);
-    return signature;
-  };
-}
-
-function createECDSAVerifer(bits) {
-  var inner = createKeyVerifier(bits);
-  return function verify(thing, signature, publicKey) {
-    signature = formatEcdsa.joseToDer(signature, 'ES' + bits).toString('base64');
-    var result = inner(thing, signature, publicKey);
-    return result;
-  };
-}
-
-function createNoneSigner() {
-  return function sign() {
-    return '';
-  }
-}
-
-function createNoneVerifier() {
-  return function verify(thing, signature) {
-    return signature === '';
-  }
-}
-
-module.exports = function jwa(algorithm) {
-  var signerFactories = {
-    hs: createHmacSigner,
-    rs: createKeySigner,
-    ps: createPSSKeySigner,
-    es: createECDSASigner,
-    none: createNoneSigner,
-  }
-  var verifierFactories = {
-    hs: createHmacVerifier,
-    rs: createKeyVerifier,
-    ps: createPSSKeyVerifier,
-    es: createECDSAVerifer,
-    none: createNoneVerifier,
-  }
-  var match = algorithm.match(/^(RS|PS|ES|HS)(256|384|512)$|^(none)$/i);
-  if (!match)
-    throw typeError(MSG_INVALID_ALGORITHM, algorithm);
-  var algo = (match[1] || match[3]).toLowerCase();
-  var bits = match[2];
-
-  return {
-    sign: signerFactories[algo](bits),
-    verify: verifierFactories[algo](bits),
-  }
-};
-
-},{"buffer-equal-constant-time":159,"crypto":55,"ecdsa-sig-formatter":160,"safe-buffer":186,"util":157}],174:[function(require,module,exports){
-/*global exports*/
-var SignStream = require('./lib/sign-stream');
-var VerifyStream = require('./lib/verify-stream');
-
-var ALGORITHMS = [
-  'HS256', 'HS384', 'HS512',
-  'RS256', 'RS384', 'RS512',
-  'PS256', 'PS384', 'PS512',
-  'ES256', 'ES384', 'ES512'
-];
-
-exports.ALGORITHMS = ALGORITHMS;
-exports.sign = SignStream.sign;
-exports.verify = VerifyStream.verify;
-exports.decode = VerifyStream.decode;
-exports.isValid = VerifyStream.isValid;
-exports.createSign = function createSign(opts) {
-  return new SignStream(opts);
-};
-exports.createVerify = function createVerify(opts) {
-  return new VerifyStream(opts);
-};
-
-},{"./lib/sign-stream":176,"./lib/verify-stream":178}],175:[function(require,module,exports){
-(function (process){
-/*global module, process*/
-var Buffer = require('safe-buffer').Buffer;
-var Stream = require('stream');
-var util = require('util');
-
-function DataStream(data) {
-  this.buffer = null;
-  this.writable = true;
-  this.readable = true;
-
-  // No input
-  if (!data) {
-    this.buffer = Buffer.alloc(0);
-    return this;
-  }
-
-  // Stream
-  if (typeof data.pipe === 'function') {
-    this.buffer = Buffer.alloc(0);
-    data.pipe(this);
-    return this;
-  }
-
-  // Buffer or String
-  // or Object (assumedly a passworded key)
-  if (data.length || typeof data === 'object') {
-    this.buffer = data;
-    this.writable = false;
-    process.nextTick(function () {
-      this.emit('end', data);
-      this.readable = false;
-      this.emit('close');
-    }.bind(this));
-    return this;
-  }
-
-  throw new TypeError('Unexpected data type ('+ typeof data + ')');
-}
-util.inherits(DataStream, Stream);
-
-DataStream.prototype.write = function write(data) {
-  this.buffer = Buffer.concat([this.buffer, Buffer.from(data)]);
-  this.emit('data', data);
-};
-
-DataStream.prototype.end = function end(data) {
-  if (data)
-    this.write(data);
-  this.emit('end', data);
-  this.emit('close');
-  this.writable = false;
-  this.readable = false;
-};
-
-module.exports = DataStream;
-
-}).call(this,require('_process'))
-},{"_process":117,"safe-buffer":186,"stream":151,"util":157}],176:[function(require,module,exports){
-/*global module*/
-var Buffer = require('safe-buffer').Buffer;
-var DataStream = require('./data-stream');
-var jwa = require('jwa');
-var Stream = require('stream');
-var toString = require('./tostring');
-var util = require('util');
-
-function base64url(string, encoding) {
-  return Buffer
-    .from(string, encoding)
-    .toString('base64')
-    .replace(/=/g, '')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_');
-}
-
-function jwsSecuredInput(header, payload, encoding) {
-  encoding = encoding || 'utf8';
-  var encodedHeader = base64url(toString(header), 'binary');
-  var encodedPayload = base64url(toString(payload), encoding);
-  return util.format('%s.%s', encodedHeader, encodedPayload);
-}
-
-function jwsSign(opts) {
-  var header = opts.header;
-  var payload = opts.payload;
-  var secretOrKey = opts.secret || opts.privateKey;
-  var encoding = opts.encoding;
-  var algo = jwa(header.alg);
-  var securedInput = jwsSecuredInput(header, payload, encoding);
-  var signature = algo.sign(securedInput, secretOrKey);
-  return util.format('%s.%s', securedInput, signature);
-}
-
-function SignStream(opts) {
-  var secret = opts.secret||opts.privateKey||opts.key;
-  var secretStream = new DataStream(secret);
-  this.readable = true;
-  this.header = opts.header;
-  this.encoding = opts.encoding;
-  this.secret = this.privateKey = this.key = secretStream;
-  this.payload = new DataStream(opts.payload);
-  this.secret.once('close', function () {
-    if (!this.payload.writable && this.readable)
-      this.sign();
-  }.bind(this));
-
-  this.payload.once('close', function () {
-    if (!this.secret.writable && this.readable)
-      this.sign();
-  }.bind(this));
-}
-util.inherits(SignStream, Stream);
-
-SignStream.prototype.sign = function sign() {
-  try {
-    var signature = jwsSign({
-      header: this.header,
-      payload: this.payload.buffer,
-      secret: this.secret.buffer,
-      encoding: this.encoding
-    });
-    this.emit('done', signature);
-    this.emit('data', signature);
-    this.emit('end');
-    this.readable = false;
-    return signature;
-  } catch (e) {
-    this.readable = false;
-    this.emit('error', e);
-    this.emit('close');
-  }
-};
-
-SignStream.sign = jwsSign;
-
-module.exports = SignStream;
-
-},{"./data-stream":175,"./tostring":177,"jwa":173,"safe-buffer":186,"stream":151,"util":157}],177:[function(require,module,exports){
-/*global module*/
-var Buffer = require('buffer').Buffer;
-
-module.exports = function toString(obj) {
-  if (typeof obj === 'string')
-    return obj;
-  if (typeof obj === 'number' || Buffer.isBuffer(obj))
-    return obj.toString();
-  return JSON.stringify(obj);
-};
-
-},{"buffer":47}],178:[function(require,module,exports){
-/*global module*/
-var Buffer = require('safe-buffer').Buffer;
-var DataStream = require('./data-stream');
-var jwa = require('jwa');
-var Stream = require('stream');
-var toString = require('./tostring');
-var util = require('util');
-var JWS_REGEX = /^[a-zA-Z0-9\-_]+?\.[a-zA-Z0-9\-_]+?\.([a-zA-Z0-9\-_]+)?$/;
-
-function isObject(thing) {
-  return Object.prototype.toString.call(thing) === '[object Object]';
-}
-
-function safeJsonParse(thing) {
-  if (isObject(thing))
-    return thing;
-  try { return JSON.parse(thing); }
-  catch (e) { return undefined; }
-}
-
-function headerFromJWS(jwsSig) {
-  var encodedHeader = jwsSig.split('.', 1)[0];
-  return safeJsonParse(Buffer.from(encodedHeader, 'base64').toString('binary'));
-}
-
-function securedInputFromJWS(jwsSig) {
-  return jwsSig.split('.', 2).join('.');
-}
-
-function signatureFromJWS(jwsSig) {
-  return jwsSig.split('.')[2];
-}
-
-function payloadFromJWS(jwsSig, encoding) {
-  encoding = encoding || 'utf8';
-  var payload = jwsSig.split('.')[1];
-  return Buffer.from(payload, 'base64').toString(encoding);
-}
-
-function isValidJws(string) {
-  return JWS_REGEX.test(string) && !!headerFromJWS(string);
-}
-
-function jwsVerify(jwsSig, algorithm, secretOrKey) {
-  if (!algorithm) {
-    var err = new Error("Missing algorithm parameter for jws.verify");
-    err.code = "MISSING_ALGORITHM";
-    throw err;
-  }
-  jwsSig = toString(jwsSig);
-  var signature = signatureFromJWS(jwsSig);
-  var securedInput = securedInputFromJWS(jwsSig);
-  var algo = jwa(algorithm);
-  return algo.verify(securedInput, signature, secretOrKey);
-}
-
-function jwsDecode(jwsSig, opts) {
-  opts = opts || {};
-  jwsSig = toString(jwsSig);
-
-  if (!isValidJws(jwsSig))
-    return null;
-
-  var header = headerFromJWS(jwsSig);
-
-  if (!header)
-    return null;
-
-  var payload = payloadFromJWS(jwsSig);
-  if (header.typ === 'JWT' || opts.json)
-    payload = JSON.parse(payload, opts.encoding);
-
-  return {
-    header: header,
-    payload: payload,
-    signature: signatureFromJWS(jwsSig)
-  };
-}
-
-function VerifyStream(opts) {
-  opts = opts || {};
-  var secretOrKey = opts.secret||opts.publicKey||opts.key;
-  var secretStream = new DataStream(secretOrKey);
-  this.readable = true;
-  this.algorithm = opts.algorithm;
-  this.encoding = opts.encoding;
-  this.secret = this.publicKey = this.key = secretStream;
-  this.signature = new DataStream(opts.signature);
-  this.secret.once('close', function () {
-    if (!this.signature.writable && this.readable)
-      this.verify();
-  }.bind(this));
-
-  this.signature.once('close', function () {
-    if (!this.secret.writable && this.readable)
-      this.verify();
-  }.bind(this));
-}
-util.inherits(VerifyStream, Stream);
-VerifyStream.prototype.verify = function verify() {
-  try {
-    var valid = jwsVerify(this.signature.buffer, this.algorithm, this.key.buffer);
-    var obj = jwsDecode(this.signature.buffer, this.encoding);
-    this.emit('done', valid, obj);
-    this.emit('data', valid);
-    this.emit('end');
-    this.readable = false;
-    return valid;
-  } catch (e) {
-    this.readable = false;
-    this.emit('error', e);
-    this.emit('close');
-  }
-};
-
-VerifyStream.decode = jwsDecode;
-VerifyStream.isValid = isValidJws;
-VerifyStream.verify = jwsVerify;
-
-module.exports = VerifyStream;
-
-},{"./data-stream":175,"./tostring":177,"jwa":173,"safe-buffer":186,"stream":151,"util":157}],179:[function(require,module,exports){
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0,
-    MAX_SAFE_INTEGER = 9007199254740991,
-    MAX_INTEGER = 1.7976931348623157e+308,
-    NAN = 0 / 0;
-
-/** `Object#toString` result references. */
-var argsTag = '[object Arguments]',
-    funcTag = '[object Function]',
-    genTag = '[object GeneratorFunction]',
-    stringTag = '[object String]',
-    symbolTag = '[object Symbol]';
-
-/** Used to match leading and trailing whitespace. */
-var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Used to detect unsigned integer values. */
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/**
- * A specialized version of `_.map` for arrays without support for iteratee
- * shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the new mapped array.
- */
-function arrayMap(array, iteratee) {
-  var index = -1,
-      length = array ? array.length : 0,
-      result = Array(length);
-
-  while (++index < length) {
-    result[index] = iteratee(array[index], index, array);
-  }
-  return result;
-}
-
-/**
- * The base implementation of `_.findIndex` and `_.findLastIndex` without
- * support for iteratee shorthands.
- *
- * @private
- * @param {Array} array The array to inspect.
- * @param {Function} predicate The function invoked per iteration.
- * @param {number} fromIndex The index to search from.
- * @param {boolean} [fromRight] Specify iterating from right to left.
- * @returns {number} Returns the index of the matched value, else `-1`.
- */
-function baseFindIndex(array, predicate, fromIndex, fromRight) {
-  var length = array.length,
-      index = fromIndex + (fromRight ? 1 : -1);
-
-  while ((fromRight ? index-- : ++index < length)) {
-    if (predicate(array[index], index, array)) {
-      return index;
-    }
-  }
-  return -1;
-}
-
-/**
- * The base implementation of `_.indexOf` without `fromIndex` bounds checks.
- *
- * @private
- * @param {Array} array The array to inspect.
- * @param {*} value The value to search for.
- * @param {number} fromIndex The index to search from.
- * @returns {number} Returns the index of the matched value, else `-1`.
- */
-function baseIndexOf(array, value, fromIndex) {
-  if (value !== value) {
-    return baseFindIndex(array, baseIsNaN, fromIndex);
-  }
-  var index = fromIndex - 1,
-      length = array.length;
-
-  while (++index < length) {
-    if (array[index] === value) {
-      return index;
-    }
-  }
-  return -1;
-}
-
-/**
- * The base implementation of `_.isNaN` without support for number objects.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.
- */
-function baseIsNaN(value) {
-  return value !== value;
-}
-
-/**
- * The base implementation of `_.times` without support for iteratee shorthands
- * or max array length checks.
- *
- * @private
- * @param {number} n The number of times to invoke `iteratee`.
- * @param {Function} iteratee The function invoked per iteration.
- * @returns {Array} Returns the array of results.
- */
-function baseTimes(n, iteratee) {
-  var index = -1,
-      result = Array(n);
-
-  while (++index < n) {
-    result[index] = iteratee(index);
-  }
-  return result;
-}
-
-/**
- * The base implementation of `_.values` and `_.valuesIn` which creates an
- * array of `object` property values corresponding to the property names
- * of `props`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {Array} props The property names to get values for.
- * @returns {Object} Returns the array of property values.
- */
-function baseValues(object, props) {
-  return arrayMap(props, function(key) {
-    return object[key];
-  });
-}
-
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg(func, transform) {
-  return function(arg) {
-    return func(transform(arg));
-  };
-}
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/** Built-in value references. */
-var propertyIsEnumerable = objectProto.propertyIsEnumerable;
-
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeKeys = overArg(Object.keys, Object),
-    nativeMax = Math.max;
-
-/**
- * Creates an array of the enumerable property names of the array-like `value`.
- *
- * @private
- * @param {*} value The value to query.
- * @param {boolean} inherited Specify returning inherited property names.
- * @returns {Array} Returns the array of property names.
- */
-function arrayLikeKeys(value, inherited) {
-  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
-  // Safari 9 makes `arguments.length` enumerable in strict mode.
-  var result = (isArray(value) || isArguments(value))
-    ? baseTimes(value.length, String)
-    : [];
-
-  var length = result.length,
-      skipIndexes = !!length;
-
-  for (var key in value) {
-    if ((inherited || hasOwnProperty.call(value, key)) &&
-        !(skipIndexes && (key == 'length' || isIndex(key, length)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- */
-function baseKeys(object) {
-  if (!isPrototype(object)) {
-    return nativeKeys(object);
-  }
-  var result = [];
-  for (var key in Object(object)) {
-    if (hasOwnProperty.call(object, key) && key != 'constructor') {
-      result.push(key);
-    }
-  }
-  return result;
-}
-
-/**
- * Checks if `value` is a valid array-like index.
- *
- * @private
- * @param {*} value The value to check.
- * @param {number} [length=MAX_SAFE_INTEGER] The upper bounds of a valid index.
- * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
- */
-function isIndex(value, length) {
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return !!length &&
-    (typeof value == 'number' || reIsUint.test(value)) &&
-    (value > -1 && value % 1 == 0 && value < length);
-}
-
-/**
- * Checks if `value` is likely a prototype object.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
- */
-function isPrototype(value) {
-  var Ctor = value && value.constructor,
-      proto = (typeof Ctor == 'function' && Ctor.prototype) || objectProto;
-
-  return value === proto;
-}
-
-/**
- * Checks if `value` is in `collection`. If `collection` is a string, it's
- * checked for a substring of `value`, otherwise
- * [`SameValueZero`](http://ecma-international.org/ecma-262/7.0/#sec-samevaluezero)
- * is used for equality comparisons. If `fromIndex` is negative, it's used as
- * the offset from the end of `collection`.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Collection
- * @param {Array|Object|string} collection The collection to inspect.
- * @param {*} value The value to search for.
- * @param {number} [fromIndex=0] The index to search from.
- * @param- {Object} [guard] Enables use as an iteratee for methods like `_.reduce`.
- * @returns {boolean} Returns `true` if `value` is found, else `false`.
- * @example
- *
- * _.includes([1, 2, 3], 1);
- * // => true
- *
- * _.includes([1, 2, 3], 1, 2);
- * // => false
- *
- * _.includes({ 'a': 1, 'b': 2 }, 1);
- * // => true
- *
- * _.includes('abcd', 'bc');
- * // => true
- */
-function includes(collection, value, fromIndex, guard) {
-  collection = isArrayLike(collection) ? collection : values(collection);
-  fromIndex = (fromIndex && !guard) ? toInteger(fromIndex) : 0;
-
-  var length = collection.length;
-  if (fromIndex < 0) {
-    fromIndex = nativeMax(length + fromIndex, 0);
-  }
-  return isString(collection)
-    ? (fromIndex <= length && collection.indexOf(value, fromIndex) > -1)
-    : (!!length && baseIndexOf(collection, value, fromIndex) > -1);
-}
-
-/**
- * Checks if `value` is likely an `arguments` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an `arguments` object,
- *  else `false`.
- * @example
- *
- * _.isArguments(function() { return arguments; }());
- * // => true
- *
- * _.isArguments([1, 2, 3]);
- * // => false
- */
-function isArguments(value) {
-  // Safari 8.1 makes `arguments.callee` enumerable in strict mode.
-  return isArrayLikeObject(value) && hasOwnProperty.call(value, 'callee') &&
-    (!propertyIsEnumerable.call(value, 'callee') || objectToString.call(value) == argsTag);
-}
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
-/**
- * Checks if `value` is array-like. A value is considered array-like if it's
- * not a function and has a `value.length` that's an integer greater than or
- * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- * @example
- *
- * _.isArrayLike([1, 2, 3]);
- * // => true
- *
- * _.isArrayLike(document.body.children);
- * // => true
- *
- * _.isArrayLike('abc');
- * // => true
- *
- * _.isArrayLike(_.noop);
- * // => false
- */
-function isArrayLike(value) {
-  return value != null && isLength(value.length) && !isFunction(value);
-}
-
-/**
- * This method is like `_.isArrayLike` except that it also checks if `value`
- * is an object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array-like object,
- *  else `false`.
- * @example
- *
- * _.isArrayLikeObject([1, 2, 3]);
- * // => true
- *
- * _.isArrayLikeObject(document.body.children);
- * // => true
- *
- * _.isArrayLikeObject('abc');
- * // => false
- *
- * _.isArrayLikeObject(_.noop);
- * // => false
- */
-function isArrayLikeObject(value) {
-  return isObjectLike(value) && isArrayLike(value);
-}
-
-/**
- * Checks if `value` is classified as a `Function` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a function, else `false`.
- * @example
- *
- * _.isFunction(_);
- * // => true
- *
- * _.isFunction(/abc/);
- * // => false
- */
-function isFunction(value) {
-  // The use of `Object#toString` avoids issues with the `typeof` operator
-  // in Safari 8-9 which returns 'object' for typed array and other constructors.
-  var tag = isObject(value) ? objectToString.call(value) : '';
-  return tag == funcTag || tag == genTag;
-}
-
-/**
- * Checks if `value` is a valid array-like length.
- *
- * **Note:** This method is loosely based on
- * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
- * @example
- *
- * _.isLength(3);
- * // => true
- *
- * _.isLength(Number.MIN_VALUE);
- * // => false
- *
- * _.isLength(Infinity);
- * // => false
- *
- * _.isLength('3');
- * // => false
- */
-function isLength(value) {
-  return typeof value == 'number' &&
-    value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-}
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `String` primitive or object.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a string, else `false`.
- * @example
- *
- * _.isString('abc');
- * // => true
- *
- * _.isString(1);
- * // => false
- */
-function isString(value) {
-  return typeof value == 'string' ||
-    (!isArray(value) && isObjectLike(value) && objectToString.call(value) == stringTag);
-}
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && objectToString.call(value) == symbolTag);
-}
-
-/**
- * Converts `value` to a finite number.
- *
- * @static
- * @memberOf _
- * @since 4.12.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted number.
- * @example
- *
- * _.toFinite(3.2);
- * // => 3.2
- *
- * _.toFinite(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toFinite(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toFinite('3.2');
- * // => 3.2
- */
-function toFinite(value) {
-  if (!value) {
-    return value === 0 ? value : 0;
-  }
-  value = toNumber(value);
-  if (value === INFINITY || value === -INFINITY) {
-    var sign = (value < 0 ? -1 : 1);
-    return sign * MAX_INTEGER;
-  }
-  return value === value ? value : 0;
-}
-
-/**
- * Converts `value` to an integer.
- *
- * **Note:** This method is loosely based on
- * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted integer.
- * @example
- *
- * _.toInteger(3.2);
- * // => 3
- *
- * _.toInteger(Number.MIN_VALUE);
- * // => 0
- *
- * _.toInteger(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toInteger('3.2');
- * // => 3
- */
-function toInteger(value) {
-  var result = toFinite(value),
-      remainder = result % 1;
-
-  return result === result ? (remainder ? result - remainder : result) : 0;
-}
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol(value)) {
-    return NAN;
-  }
-  if (isObject(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject(other) ? (other + '') : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = value.replace(reTrim, '');
-  var isBinary = reIsBinary.test(value);
-  return (isBinary || reIsOctal.test(value))
-    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-    : (reIsBadHex.test(value) ? NAN : +value);
-}
-
-/**
- * Creates an array of the own enumerable property names of `object`.
- *
- * **Note:** Non-object values are coerced to objects. See the
- * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)
- * for more details.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property names.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.keys(new Foo);
- * // => ['a', 'b'] (iteration order is not guaranteed)
- *
- * _.keys('hi');
- * // => ['0', '1']
- */
-function keys(object) {
-  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
-}
-
-/**
- * Creates an array of the own enumerable string keyed property values of `object`.
- *
- * **Note:** Non-object values are coerced to objects.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Object
- * @param {Object} object The object to query.
- * @returns {Array} Returns the array of property values.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- *   this.b = 2;
- * }
- *
- * Foo.prototype.c = 3;
- *
- * _.values(new Foo);
- * // => [1, 2] (iteration order is not guaranteed)
- *
- * _.values('hi');
- * // => ['h', 'i']
- */
-function values(object) {
-  return object ? baseValues(object, keys(object)) : [];
-}
-
-module.exports = includes;
-
-},{}],180:[function(require,module,exports){
-/**
- * lodash 3.0.3 (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var boolTag = '[object Boolean]';
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/**
- * Checks if `value` is classified as a boolean primitive or object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isBoolean(false);
- * // => true
- *
- * _.isBoolean(null);
- * // => false
- */
-function isBoolean(value) {
-  return value === true || value === false ||
-    (isObjectLike(value) && objectToString.call(value) == boolTag);
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-module.exports = isBoolean;
-
-},{}],181:[function(require,module,exports){
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0,
-    MAX_INTEGER = 1.7976931348623157e+308,
-    NAN = 0 / 0;
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/** Used to match leading and trailing whitespace. */
-var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/**
- * Checks if `value` is an integer.
- *
- * **Note:** This method is based on
- * [`Number.isInteger`](https://mdn.io/Number/isInteger).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an integer, else `false`.
- * @example
- *
- * _.isInteger(3);
- * // => true
- *
- * _.isInteger(Number.MIN_VALUE);
- * // => false
- *
- * _.isInteger(Infinity);
- * // => false
- *
- * _.isInteger('3');
- * // => false
- */
-function isInteger(value) {
-  return typeof value == 'number' && value == toInteger(value);
-}
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && objectToString.call(value) == symbolTag);
-}
-
-/**
- * Converts `value` to a finite number.
- *
- * @static
- * @memberOf _
- * @since 4.12.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted number.
- * @example
- *
- * _.toFinite(3.2);
- * // => 3.2
- *
- * _.toFinite(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toFinite(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toFinite('3.2');
- * // => 3.2
- */
-function toFinite(value) {
-  if (!value) {
-    return value === 0 ? value : 0;
-  }
-  value = toNumber(value);
-  if (value === INFINITY || value === -INFINITY) {
-    var sign = (value < 0 ? -1 : 1);
-    return sign * MAX_INTEGER;
-  }
-  return value === value ? value : 0;
-}
-
-/**
- * Converts `value` to an integer.
- *
- * **Note:** This method is loosely based on
- * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted integer.
- * @example
- *
- * _.toInteger(3.2);
- * // => 3
- *
- * _.toInteger(Number.MIN_VALUE);
- * // => 0
- *
- * _.toInteger(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toInteger('3.2');
- * // => 3
- */
-function toInteger(value) {
-  var result = toFinite(value),
-      remainder = result % 1;
-
-  return result === result ? (remainder ? result - remainder : result) : 0;
-}
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol(value)) {
-    return NAN;
-  }
-  if (isObject(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject(other) ? (other + '') : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = value.replace(reTrim, '');
-  var isBinary = reIsBinary.test(value);
-  return (isBinary || reIsOctal.test(value))
-    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-    : (reIsBadHex.test(value) ? NAN : +value);
-}
-
-module.exports = isInteger;
-
-},{}],182:[function(require,module,exports){
-/**
- * lodash 3.0.3 (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var numberTag = '[object Number]';
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `Number` primitive or object.
- *
- * **Note:** To exclude `Infinity`, `-Infinity`, and `NaN`, which are classified
- * as numbers, use the `_.isFinite` method.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isNumber(3);
- * // => true
- *
- * _.isNumber(Number.MIN_VALUE);
- * // => true
- *
- * _.isNumber(Infinity);
- * // => true
- *
- * _.isNumber('3');
- * // => false
- */
-function isNumber(value) {
-  return typeof value == 'number' ||
-    (isObjectLike(value) && objectToString.call(value) == numberTag);
-}
-
-module.exports = isNumber;
-
-},{}],183:[function(require,module,exports){
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** `Object#toString` result references. */
-var objectTag = '[object Object]';
-
-/**
- * Checks if `value` is a host object in IE < 9.
- *
- * @private
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a host object, else `false`.
- */
-function isHostObject(value) {
-  // Many host objects are `Object` objects that can coerce to strings
-  // despite having improperly defined `toString` methods.
-  var result = false;
-  if (value != null && typeof value.toString != 'function') {
-    try {
-      result = !!(value + '');
-    } catch (e) {}
-  }
-  return result;
-}
-
-/**
- * Creates a unary function that invokes `func` with its argument transformed.
- *
- * @private
- * @param {Function} func The function to wrap.
- * @param {Function} transform The argument transform.
- * @returns {Function} Returns the new function.
- */
-function overArg(func, transform) {
-  return function(arg) {
-    return func(transform(arg));
-  };
-}
-
-/** Used for built-in method references. */
-var funcProto = Function.prototype,
-    objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Used to infer the `Object` constructor. */
-var objectCtorString = funcToString.call(Object);
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/** Built-in value references. */
-var getPrototype = overArg(Object.getPrototypeOf, Object);
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is a plain object, that is, an object created by the
- * `Object` constructor or one with a `[[Prototype]]` of `null`.
- *
- * @static
- * @memberOf _
- * @since 0.8.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- * }
- *
- * _.isPlainObject(new Foo);
- * // => false
- *
- * _.isPlainObject([1, 2, 3]);
- * // => false
- *
- * _.isPlainObject({ 'x': 0, 'y': 0 });
- * // => true
- *
- * _.isPlainObject(Object.create(null));
- * // => true
- */
-function isPlainObject(value) {
-  if (!isObjectLike(value) ||
-      objectToString.call(value) != objectTag || isHostObject(value)) {
-    return false;
-  }
-  var proto = getPrototype(value);
-  if (proto === null) {
-    return true;
-  }
-  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-  return (typeof Ctor == 'function' &&
-    Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
-}
-
-module.exports = isPlainObject;
-
-},{}],184:[function(require,module,exports){
-/**
- * lodash 4.0.1 (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright 2012-2016 The Dojo Foundation <http://dojofoundation.org/>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright 2009-2016 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- * Available under MIT license <https://lodash.com/license>
- */
-
-/** `Object#toString` result references. */
-var stringTag = '[object String]';
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @type Function
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `String` primitive or object.
- *
- * @static
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is correctly classified, else `false`.
- * @example
- *
- * _.isString('abc');
- * // => true
- *
- * _.isString(1);
- * // => false
- */
-function isString(value) {
-  return typeof value == 'string' ||
-    (!isArray(value) && isObjectLike(value) && objectToString.call(value) == stringTag);
-}
-
-module.exports = isString;
-
-},{}],185:[function(require,module,exports){
-/**
- * lodash (Custom Build) <https://lodash.com/>
- * Build: `lodash modularize exports="npm" -o ./`
- * Copyright jQuery Foundation and other contributors <https://jquery.org/>
- * Released under MIT license <https://lodash.com/license>
- * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
- * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
- */
-
-/** Used as the `TypeError` message for "Functions" methods. */
-var FUNC_ERROR_TEXT = 'Expected a function';
-
-/** Used as references for various `Number` constants. */
-var INFINITY = 1 / 0,
-    MAX_INTEGER = 1.7976931348623157e+308,
-    NAN = 0 / 0;
-
-/** `Object#toString` result references. */
-var symbolTag = '[object Symbol]';
-
-/** Used to match leading and trailing whitespace. */
-var reTrim = /^\s+|\s+$/g;
-
-/** Used to detect bad signed hexadecimal string values. */
-var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
-
-/** Used to detect binary string values. */
-var reIsBinary = /^0b[01]+$/i;
-
-/** Used to detect octal string values. */
-var reIsOctal = /^0o[0-7]+$/i;
-
-/** Built-in method references without a dependency on `root`. */
-var freeParseInt = parseInt;
-
-/** Used for built-in method references. */
-var objectProto = Object.prototype;
-
-/**
- * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
- * of values.
- */
-var objectToString = objectProto.toString;
-
-/**
- * Creates a function that invokes `func`, with the `this` binding and arguments
- * of the created function, while it's called less than `n` times. Subsequent
- * calls to the created function return the result of the last `func` invocation.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category Function
- * @param {number} n The number of calls at which `func` is no longer invoked.
- * @param {Function} func The function to restrict.
- * @returns {Function} Returns the new restricted function.
- * @example
- *
- * jQuery(element).on('click', _.before(5, addContactToList));
- * // => Allows adding up to 4 contacts to the list.
- */
-function before(n, func) {
-  var result;
-  if (typeof func != 'function') {
-    throw new TypeError(FUNC_ERROR_TEXT);
-  }
-  n = toInteger(n);
-  return function() {
-    if (--n > 0) {
-      result = func.apply(this, arguments);
-    }
-    if (n <= 1) {
-      func = undefined;
-    }
-    return result;
-  };
-}
-
-/**
- * Creates a function that is restricted to invoking `func` once. Repeat calls
- * to the function return the value of the first invocation. The `func` is
- * invoked with the `this` binding and arguments of the created function.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Function
- * @param {Function} func The function to restrict.
- * @returns {Function} Returns the new restricted function.
- * @example
- *
- * var initialize = _.once(createApplication);
- * initialize();
- * initialize();
- * // => `createApplication` is invoked once
- */
-function once(func) {
-  return before(2, func);
-}
-
-/**
- * Checks if `value` is the
- * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
- * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an object, else `false`.
- * @example
- *
- * _.isObject({});
- * // => true
- *
- * _.isObject([1, 2, 3]);
- * // => true
- *
- * _.isObject(_.noop);
- * // => true
- *
- * _.isObject(null);
- * // => false
- */
-function isObject(value) {
-  var type = typeof value;
-  return !!value && (type == 'object' || type == 'function');
-}
-
-/**
- * Checks if `value` is object-like. A value is object-like if it's not `null`
- * and has a `typeof` result of "object".
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
- * @example
- *
- * _.isObjectLike({});
- * // => true
- *
- * _.isObjectLike([1, 2, 3]);
- * // => true
- *
- * _.isObjectLike(_.noop);
- * // => false
- *
- * _.isObjectLike(null);
- * // => false
- */
-function isObjectLike(value) {
-  return !!value && typeof value == 'object';
-}
-
-/**
- * Checks if `value` is classified as a `Symbol` primitive or object.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a symbol, else `false`.
- * @example
- *
- * _.isSymbol(Symbol.iterator);
- * // => true
- *
- * _.isSymbol('abc');
- * // => false
- */
-function isSymbol(value) {
-  return typeof value == 'symbol' ||
-    (isObjectLike(value) && objectToString.call(value) == symbolTag);
-}
-
-/**
- * Converts `value` to a finite number.
- *
- * @static
- * @memberOf _
- * @since 4.12.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted number.
- * @example
- *
- * _.toFinite(3.2);
- * // => 3.2
- *
- * _.toFinite(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toFinite(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toFinite('3.2');
- * // => 3.2
- */
-function toFinite(value) {
-  if (!value) {
-    return value === 0 ? value : 0;
-  }
-  value = toNumber(value);
-  if (value === INFINITY || value === -INFINITY) {
-    var sign = (value < 0 ? -1 : 1);
-    return sign * MAX_INTEGER;
-  }
-  return value === value ? value : 0;
-}
-
-/**
- * Converts `value` to an integer.
- *
- * **Note:** This method is loosely based on
- * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to convert.
- * @returns {number} Returns the converted integer.
- * @example
- *
- * _.toInteger(3.2);
- * // => 3
- *
- * _.toInteger(Number.MIN_VALUE);
- * // => 0
- *
- * _.toInteger(Infinity);
- * // => 1.7976931348623157e+308
- *
- * _.toInteger('3.2');
- * // => 3
- */
-function toInteger(value) {
-  var result = toFinite(value),
-      remainder = result % 1;
-
-  return result === result ? (remainder ? result - remainder : result) : 0;
-}
-
-/**
- * Converts `value` to a number.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to process.
- * @returns {number} Returns the number.
- * @example
- *
- * _.toNumber(3.2);
- * // => 3.2
- *
- * _.toNumber(Number.MIN_VALUE);
- * // => 5e-324
- *
- * _.toNumber(Infinity);
- * // => Infinity
- *
- * _.toNumber('3.2');
- * // => 3.2
- */
-function toNumber(value) {
-  if (typeof value == 'number') {
-    return value;
-  }
-  if (isSymbol(value)) {
-    return NAN;
-  }
-  if (isObject(value)) {
-    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
-    value = isObject(other) ? (other + '') : other;
-  }
-  if (typeof value != 'string') {
-    return value === 0 ? value : +value;
-  }
-  value = value.replace(reTrim, '');
-  var isBinary = reIsBinary.test(value);
-  return (isBinary || reIsOctal.test(value))
-    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
-    : (reIsBadHex.test(value) ? NAN : +value);
 }
 
-module.exports = once;
+module.exports = Cryptr;
 
-},{}],186:[function(require,module,exports){
-arguments[4][135][0].apply(exports,arguments)
-},{"buffer":47,"dup":135}],187:[function(require,module,exports){
-let jwt = require("jsonwebtoken");
+}).call(this,require("buffer").Buffer)
+},{"buffer":47,"crypto":55}],157:[function(require,module,exports){
+let Cryptr = require("cryptr");
 let editMode = false;
+let cryptr = new Cryptr("TheSecret");
+let sampleImagesCreated = false;
+let visionBoardSize = {
+  width: parseInt("800px", 10),
+  height: parseInt("375px", 10)
+};
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
-  CreateSampleImages();
+  SetupBackgroundSlideshow();
   ConfigureButtons();
-  SetUpLogin();
+  CheckIfLoggedIn();
 });
 
+function SetupBackgroundSlideshow() {
+  let backgrounds = [
+  ];
+
+  $("#content-area").css("background-image", "url('../images/backgrounds/nature-1.gif')");
+}
+
 function ConfigureButtons() {
+
+  $('.modal').on('hidden.bs.modal', function (e) {
+    $(this)
+      .find("input,textarea,select")
+      .val('')
+      .end()
+      .find("input[type=checkbox], input[type=radio]")
+      .prop("checked", "")
+      .end();
+  });
+
+  // Display the 'Create New Account' modal when '#signup-btn' is clicked
+  $("#signup-btn").click(function () {
+    $("#signup-modal").modal('toggle');
+  });
+
+  // Confirms signup & adds new user to the database if valid
+  $("#confirm-signup-btn").click(function () {
+
+    let newUser = {
+      name: $("#newuser-name").val().trim(),
+      password: cryptr.encrypt($("#newuser-password").val().trim())
+    };
+
+    VerifyNewUser(newUser);
+  });
+
+  // Removes any stored data from local storage and switches back to login page
+  $("#logout-btn").click(function () {
+
+    Refresh();
+
+    $("#boards-list-side").fadeOut('fast');
+    $("#vision-board-side").fadeOut('fast');
+    $("#user-welcome").text("");
+    $("#user-welcome").attr("userid", "");
+    $("#login-area").fadeIn();
+
+  });
+
+  // Display the 'Login' modal when '#login-btn' is clicked
+  $("#login-btn").click(function () {
+    $("#login-modal").modal('toggle');
+  });
+
+  // Confirms login then shows the main page content
+  $("#confirm-login-btn").click(function () {
+    let user = {
+      name: $("#user-name").val().trim(),
+      password: cryptr.encrypt($("#user-password").val().trim())
+    };
+
+    VerifyUserLogin(user);
+  });
 
   // Display the 'Add New Goal' modal when '#add-btn' is clicked
   $("#add-btn").click(function () {
     $("#goal-modal").modal('toggle');
   });
 
+  $("#confirm-goal-btn").click(function () {
+    let newGoal = {
+      description: $("#goal-desc").val().trim(),
+      image: $("#goal-image").val().trim(),
+      BoardId: $("#board-title").attr("boardID")
+    };
+
+    AddNewGoal(newGoal);
+  });
+
   // Changes the images on the board to 'edit' mode
-  $("#edit-btn").click(function() {
+  $("#edit-btn").click(function () {
 
     editMode = true;
+    $("#done-btn").attr("disabled", false);
 
     let previews = $(".boardIMG").css({
-      "border-color": "white",
+      "border-color": "red",
       "border-style": "dashed"
     });
   });
+  
+  $("#update-goal-btn").click(function () {
 
-    
+    let goalId = $("#editGoal-modal").attr("goal-id");
+
+    let newGoal = {
+      description: $("#editGoal-desc").val().trim(),
+      image: $("#editGoal-image").val().trim(),
+      BoardId: $("#board-title").attr("boardID")
+    };
+
+    UpdateGoal(newGoal, goalId);
+  });
+
+  $("#delete-goal-btn").click(function () {
+    let boardIMGs = $(".boardIMG");
+
+    for (i = 0; i < boardIMGs.length; i++) {
+
+      if ($("#editGoal-modal").attr("goal-id") == $(boardIMGs[i]).attr("goal")) {
+        $(boardIMGs[i]).attr("desc", "");
+        $(boardIMGs[i]).attr("img", "");
+        $(boardIMGs[i]).css({
+          "background-image": "none"
+        });
+        DeleteGoal($(boardIMGs[i]).attr("goal"));
+        break;
+      }
+
+    }
+
+    $("#editGoal-modal").modal('hide');
+  });
+
+
   // Changes the images on the board back to normal (exit edit mode)
-  $("#done-btn").click(function() {
+  $("#done-btn").click(function () {
 
     editMode = false;
+    $("#done-btn").attr("disabled", true);
 
     let previews = $(".boardIMG").css({
       "border-color": "black",
@@ -27877,36 +22719,33 @@ function ConfigureButtons() {
     $("#board-modal").modal('toggle');
   });
 
-  // Creates a ".user-board-preview" when user clicks to create a new board:
+  // Creates a ".user-board-preview" when user clicks "OK" to create a new board:
   $("#confirm-board-btn").click(function () {
 
     // Checks if board name is valid before creating the board
-    let boardName = $("#board-name").val();
+    let board = {
+      title: $("#board-name").val().trim(),
+      type: $("#board-type option:selected").text(),
+      UserId: $("#user-welcome").attr("userid")
+    };
 
-    if (boardName === "") {
+    if (board.title === "") {
+      $("#board-name").val("");
       $("#board-name").attr("placeholder", "Enter a valid name!");
     } else {
-      $("#board-modal").modal('hide');
-
-      let newBoard = $("<div class='user-board-preview'>");
-      let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
-  
-      // Set width/height to 30% of the main vision board's size
-      newBoard.css({
-        width: visionBoardRect.width * 0.3,
-        height: visionBoardRect.height * 0.3
-      });
-  
-      // Add the board preview to the '#user-boards' div and display with an animation
-      $("#user-boards").append(newBoard);
-      newBoard.hide();
-      newBoard.show({ duration: 100 });
+      GenerateNewBoard(board);
     }
 
   });
 
-  $(".close-modal").click(function() {
-    ClearModalFields();
+  $(document.body).on("click", ".user-board-preview", function () {
+    $(".user-board-preview").css({ "outline-color": "black" });
+    $(this).css({ "outline-color": "white" });
+
+    let title = $(this).attr("boardTitle");
+    $("#board-title").text(title);
+    $("#board-title").attr("boardID", $(this).attr("boardID"));
+    UpdateBoard($(this).attr("boardID"));
   });
 
   // Show fullscreen view of the vision board when 'fullscreen' button is clicked
@@ -27924,15 +22763,24 @@ function ConfigureButtons() {
     }
   });
 
-  $(".boardIMG").click(function() {
-
+  $(document.body).on("click", ".boardIMG", function() {
     if (editMode) {
+      $("#editGoal-desc").val($(this).attr("desc"));
+      $("#editGoal-image").val($(this).attr("img"));
+
       $("#editGoal-modal").modal('toggle');
+      $("#editGoal-modal").attr("goal-id", $(this).attr("goal"));
     }
   });
 
-  $("#update-goal-btn").click(function() {
-    $("#edit-mode").modal('hide');
+  $(document.body).on("mouseenter", ".boardIMG", function() {
+    $("#thisGoal-description").text($(this).attr("desc"));
+    $("#vision-board-thisGoal").fadeIn('fast');
+  });
+
+  $(document.body).on("mouseleave", ".boardIMG", function() {
+    $("#thisGoal-description").text("");
+    $("#vision-board-thisGoal").fadeOut('fast');
   });
 
 }
@@ -27940,112 +22788,351 @@ function ConfigureButtons() {
 // This function creates and adds the 10 squares for goals on the vision board:
 function CreateSampleImages() {
 
-  // Array of 10 colors (1 for each goal) that will be randomly chosen as the default background color for each goal on the vision board
-  let colors = [
-    "red",
-    "blue",
-    "green",
-    "yellow",
-    "orange",
-    "lightgreen",
-    "purple",
-    "pink",
-    "skyblue",
-    "darkred"
-  ];
+  if (!sampleImagesCreated) {
 
-  // Gets bounding box for the vision board
-  let visionBoardBox = $("#vision-board")[0].getBoundingClientRect();
+    sampleImagesCreated = true;
 
-  // Since there will be 2 rows of images on the vision board, each image's width is set to the vision board's width / 5 (5 images per row), minus a minor offset to give spacing
-  let imgWidth = (visionBoardBox.width / 5) - (6 / 5);
+    // Array of 10 colors (1 for each goal) that will be randomly chosen as the default background color for each goal on the vision board
+    let colors = [
+      "red",
+      "blue",
+      "green",
+      "yellow",
+      "orange",
+      "lightgreen",
+      "purple",
+      "pink",
+      "skyblue",
+      "darkred"
+    ];
 
-  // Similar to the imgWidth, each image's height is set to the vision board's height / 2 (2 rows), minus a minor offset for spacing
-  let imgHeight = visionBoardBox.height / 2 - (6 / 2);
+    // Gets bounding box for the vision board
+    let visionBoardBox = $("#vision-board")[0].getBoundingClientRect();
 
-  // "imgTop"/y-value & "imgLeft"/x-value will be updated for each image, so they are initliazed at (0,0) before the loop below
-  let imgTop = 0;
-  let imgLeft = 0;
+    // Since there will be 2 rows of images on the vision board, each image's width is set to the vision board's width / 5 (5 images per row), minus a minor offset to give spacing
+    let imgWidth = (visionBoardBox.width / 5) - (6 / 5);
 
-  // "randColor" will determine the background color for each image
-  let randColor;
+    // Similar to the imgWidth, each image's height is set to the vision board's height / 2 (2 rows), minus a minor offset for spacing
+    let imgHeight = visionBoardBox.height / 2 - (6 / 2);
 
-  // Loop that creates each vision board image (10 total)
-  for (let i = 0; i < 10; i++) {
+    // "imgTop"/y-value & "imgLeft"/x-value will be updated for each image, so they are initliazed at (0,0) before the loop below
+    let imgTop = 0;
+    let imgLeft = 0;
 
-    // For each iteration, pick a random color from the "colors" array to be the default background color
-    randColor = Math.floor(Math.random() * colors.length);
+    // "randColor" will determine the background color for each image
+    let randColor;
 
-    // Creates the new image
-    let newImg = $(`<div class='boardIMG' id='img-${i}'>`); // adds ".boardIMG" class to image, sets id to img-[current i value]. results should have img-0 to img-9
-    newImg.css({
-      position: "absolute",
-      padding: "25px",
-      top: imgTop,
-      left: imgLeft,
-      width: imgWidth,
-      height: imgHeight,
-      "background-color": colors[randColor],
-      transform: "rotateZ(-10deg)" // applies the minor rotation to each image
-    });
+    // Loop that creates each vision board image (10 total)
+    for (let i = 0; i < 10; i++) {
 
-    $("#vision-board").append(newImg);
+      // For each iteration, pick a random color from the "colors" array to be the default background color
+      randColor = Math.floor(Math.random() * colors.length);
 
-    // When "i = 4", this means it is time to start adding images to the second row, 
-    // so the x value (imgLeft) is reset to 0 and the y value (imgTop) is set to the second row.
-    if (i === 4) {
-      imgLeft = 0;
-      imgTop += imgHeight;
-    } else { // updates each image's x value (imgLeft)
-      imgLeft += imgWidth;
-    }
-
-    // Once an image is created, remove the used color (randColor) from the "colors" array to make sure no color is used twice
-    colors.splice(randColor, 1);
-  }
-
-  let imgID;
-
-  // "imgUpdate" will raise all of the images on the first row by 12px, and lower all images on the bottom row by 12px
-  // It is initalized at -12 for the top row and will be changed in the loop
-  let imgUpdate = "-=12px"
-
-  // The loop below will apply a minor offset to every other image's y-value and rotation to add to the boards style
-  for (let i = 0; i < 10; i++) {
-    imgID = `img-${i}`; // Gets ID of each image using the id created in the previous loop
-
-    if (i % 2 === 0) { // Since 'i' goes from 0-9, this will be true for every other image
-      $(`#${imgID}`).css({
-        top: imgUpdate,
-        transform: "rotate(10deg)" // this is the opposite of the rotation set in the previous loop
+      // Creates the new image
+      let newImg = $(`<div class='boardIMG' goal='' desc='' img='' id='img-${i}'>`); // adds ".boardIMG" class to image, sets id to img-[current i value]. results should have img-0 to img-9
+      newImg.css({
+        position: "absolute",
+        padding: "25px",
+        top: imgTop,
+        left: imgLeft,
+        width: imgWidth,
+        height: imgHeight,
+        "background-color": colors[randColor],
+        transform: "rotateZ(-10deg)" // applies the minor rotation to each image
       });
+
+      $("#vision-board").append(newImg);
+
+      // When "i = 4", this means it is time to start adding images to the second row, 
+      // so the x value (imgLeft) is reset to 0 and the y value (imgTop) is set to the second row.
+      if (i === 4) {
+        imgLeft = 0;
+        imgTop += imgHeight;
+      } else { // updates each image's x value (imgLeft)
+        imgLeft += imgWidth;
+      }
+
+      // Once an image is created, remove the used color (randColor) from the "colors" array to make sure no color is used twice
+      colors.splice(randColor, 1);
     }
 
-    // When "i = 4" we have reached the second row.
-    // Change "imgUpdate" from -12px to 12px so it will lower the images instead of raising them
-    if (i === 4) { imgUpdate = "+=12px" };
+    let imgID;
 
+    // "imgUpdate" will raise all of the images on the first row by 12px, and lower all images on the bottom row by 12px
+    // It is initalized at -12 for the top row and will be changed in the loop
+    let imgUpdate = "-=12px"
+
+    // The loop below will apply a minor offset to every other image's y-value and rotation to add to the boards style
+    for (let i = 0; i < 10; i++) {
+      imgID = `img-${i}`; // Gets ID of each image using the id created in the previous loop
+
+      if (i % 2 === 0) { // Since 'i' goes from 0-9, this will be true for every other image
+        $(`#${imgID}`).css({
+          top: imgUpdate,
+          transform: "rotate(10deg)" // this is the opposite of the rotation set in the previous loop
+        });
+      }
+
+      // When "i = 4" we have reached the second row.
+      // Change "imgUpdate" from -12px to 12px so it will lower the images instead of raising them
+      if (i === 4) { imgUpdate = "+=12px" };
+
+    }
   }
 }
 
-function ClearModalFields() {
-  $("#board-name").text("");
-  $("#goal-image").text("");
-  $("#goal-desc").text("");
-}
+function ShowHomePage(user) {
+  $("#login-area").fadeOut('fast', function () {
+    $("#boards-list-side").fadeIn();
+    $("#vision-board-side").fadeIn();
 
-// This Function sets up the login data
-function SetUpLogin() {
-  let token = jwt.sign({
-    tstUser: "itsMe",
-    tstPK: "123123"
-  }, "uSecret", { expiresIn: "1h" });
-  console.log("Token: " + token);
+    $("#user-welcome").text(`hello, ${user.name}!`);
+    $("#user-welcome").fadeIn();
 
-  jwt.verify(token, "uSecret", function (err, decoded) {
-    if (err) throw err;
-
-    console.log(decoded);
+    CreateSampleImages();
+    CheckForCreatedBoards(user.id);
   });
 }
-},{"jsonwebtoken":163}]},{},[187]);
+
+function CheckIfLoggedIn() {
+
+  if (sessionStorage.getItem("ID")) {
+    let username = cryptr.decrypt(sessionStorage.getItem("ID"));
+    $.ajax({
+      method: "GET",
+      url: "api/user/" + username
+    }).then(function (result) {
+      ShowHomePage(result);
+    })
+  }
+
+}
+
+function Refresh() {
+
+  sessionStorage.clear();
+  $("#user-boards").empty();
+  $("#board-title").text("select a board");
+
+}
+
+/*---------------------------------------------------------------------------------*/
+// AJAX FUNCTIONS --- Requests to the database are done in the following functions //
+/*---------------------------------------------------------------------------------*/
+
+function CreateUser(userInfo) {
+  $.ajax({
+    method: "POST",
+    url: "/api/user",
+    data: userInfo
+  }).then(function (result) {
+    let userID = cryptr.encrypt(userInfo.name);
+    sessionStorage.setItem("ID", userID);
+    $("#signup-modal").modal('hide');
+    $("#user-welcome").attr("userid", result.id);
+    ShowHomePage(userInfo.name);
+  });
+}
+
+function VerifyNewUser(userInfo) {
+
+  $.ajax({
+    method: "GET",
+    url: "api/createuser/" + userInfo.name
+  }).then(function (result) {
+    console.log(result);
+    if (result !== null) {
+      $("#newuser-name").val("");
+      $("#newuser-name").addClass("invalid-field");
+      $("#newuser-password").val("");
+      $("#newuser-name").attr("placeholder", "Username Already Exists");
+      return;
+    } else {
+      $("#newuser-name").removeClass("invalid-field");
+      CreateUser(userInfo);
+    }
+  });
+}
+
+function VerifyUserLogin(userInfo) {
+  $.ajax({
+    method: "GET",
+    url: "api/user/" + userInfo.name
+  }).then(function (result) {
+    if (result === null || (cryptr.decrypt(userInfo.password) !== cryptr.decrypt(result.password))) {
+      $("#user-name").val("");
+      $("#user-name").addClass("invalid-field");
+      $("#user-password").val("");
+      $("#user-name").attr("placeholder", "Invalid Username/Password");
+      return;
+    } else {
+      if (!sessionStorage.getItem("ID")) {
+        let userID = cryptr.encrypt(userInfo.name);
+        sessionStorage.setItem("ID", userID);
+      }
+
+      $("#user-name").removeClass("invalid-field");
+      $("#user-welcome").attr("userid", result.id);
+      $("#login-modal").modal('hide');
+      ShowHomePage(result);
+    }
+  });
+}
+
+function GenerateNewBoard(boardInfo) {
+  $.ajax({
+    method: "POST",
+    url: "api/boards/" + boardInfo.UserId,
+    data: boardInfo
+  }).then(function (result) {
+    if (!result) {
+      console.log("New Board failed.");
+    } else {
+      console.log(result);
+      CreateBoardPreview(result);
+    }
+  });
+}
+
+function CheckForCreatedBoards(userID) {
+  $.ajax({
+    method: "GET",
+    url: "api/boards/" + userID
+  }).then(function (result) {
+
+    console.log(result);
+
+    for (i = 0; i < result.length; i++) {
+      CreateBoardPreview(result[i]);
+    }
+  });
+}
+
+function CreateBoardPreview(board) {
+  let newBoard = $(`<div class='user-board-preview' boardID='${board.id}' boardTitle='${board.title}'>`);
+
+  // Set width/height to 30% of the main vision board's size
+  newBoard.css({
+    width: visionBoardSize.width * 0.3,
+    height: visionBoardSize.height * 0.3
+  });
+
+  let title = $("<h3>").text(`"${board.title}"`);
+  newBoard.append(title);
+
+  // Add the board preview to the '#user-boards' div and display with an animation
+  $("#user-boards").append(newBoard);
+  newBoard.hide();
+  newBoard.show({ duration: 100 });
+
+  $("#board-modal").modal('hide');
+}
+
+function AddNewGoal(goalInfo) {
+
+  let boardID = $("#board-title").attr("boardID");
+  let boardIMGs = $(".boardIMG");
+
+  $.ajax({
+    method: "GET",
+    url: "api/goals/" + boardID
+  }).then(function (dbResult) {
+
+    if (dbResult.length <= 10) {
+
+      for (i = 0; i < boardIMGs.length; i++) {
+        if ($(boardIMGs[i]).attr("desc") === "") {
+          $.ajax({
+            method: "POST",
+            url: "api/goals/" + boardID,
+            data: goalInfo
+          }).then(function (insertResult) {
+            $(boardIMGs[i]).attr("goal", insertResult.id);
+            $(boardIMGs[i]).attr("desc", insertResult.description);
+            $(boardIMGs[i]).attr("img", insertResult.image);
+
+            $(boardIMGs[i]).css({
+              "background-image": `url(${insertResult.image})`
+            });
+          });
+
+          break;
+        }
+      }
+
+    } else if (dbResult >= 10) {
+
+      let currentTitle = $("#board-title").text();
+
+      $("#board-title").text("board full!");
+      $("#board-title").css({ color: "red" });
+
+      setTimeout(function () {
+        $("#board-title").text(currentTitle);
+        $("#board-title").css({ color: "black" });
+      }, 750);
+
+    }
+
+    $("#goal-modal").modal('hide');
+
+  });
+}
+
+function DeleteGoal(goalID) {
+
+  $.ajax({
+    method: "DELETE",
+    url: "/api/goals/" + goalID
+  }).then(function(result) {
+    console.log(`${result} Goal Removed`);
+  });
+
+}
+
+function UpdateGoal(goalInfo, goalID) {
+
+  let boardID = $("#board-title").attr("boardID");
+
+  $.ajax({
+    method: "PUT",
+    url: "/api/goals/" + goalID,
+    data: goalInfo
+  }).then(function() {
+
+    UpdateBoard(boardID);
+    $("#editGoal-modal").modal('hide');
+
+  });
+
+}
+
+function UpdateBoard(boardID) {
+
+  let boardIMGs = $(".boardIMG");
+
+  $.ajax({
+    method: "GET",
+    url: "api/goals/" + boardID
+  }).then(function(result) {
+    console.log(result);
+
+    for (i = 0; i < 10; i++) {
+      if (!result[i]) {
+        $(boardIMGs[i]).attr("goal", "");
+        $(boardIMGs[i]).attr("desc", "");
+        $(boardIMGs[i]).attr("img", "");
+        $(boardIMGs[i]).css({"background-image": "none"});
+      } else {
+        $(boardIMGs[i]).attr("goal", result[i].id);
+        $(boardIMGs[i]).attr("desc", result[i].description);
+        $(boardIMGs[i]).attr("img", result[i].image);
+        $(boardIMGs[i]).css({
+          "background-image": `url(${result[i].image})`
+        });
+      }
+  }
+  });
+  
+}
+},{"cryptr":156}]},{},[157]);

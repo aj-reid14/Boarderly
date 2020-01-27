@@ -1,4 +1,25 @@
-{{!-- Modal - Pops up when user clicks on "add goal" button --}}
+{{!-- This is the navbar that appears at the top of the screen --}}
+<nav id="navbar" class="navbar navbar-expand-lg">
+  <a class="navbar-brand" href="#">[boarderly]</a>
+  {{!-- The title of the page, this should lead to the home page when clicked --}}
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a id="logout-btn" class="nav-link" href="#">logout</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">about</a>
+      </li>
+    </ul>
+    <span id="user-welcome" userid="" class="navbar-text"></span>
+  </div>
+</nav>
+
+{{!-- Modal - Add Goal - Pops up when user clicks on "add goal" button --}}
 <div class="modal fade" id="goal-modal" tabindex="-1" role="dialog" aria-labelledby="goal-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -34,8 +55,8 @@
   </div>
 </div>
 
-{{!-- Modal - Pops up when user clicks on a goal image when edit mode --}}
-<div class="modal fade" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
+{{!-- Modal - Edit Goal - Pops up when user clicks on a goal image when edit mode --}}
+<div class="modal fade" goal-id="" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -49,21 +70,21 @@
         <form>
           {{!-- Text Area for changing the goal description --}}
           <div class="form-group">
-            <label for="goal-desc" class="col-form-label">[description]</label>
-            <textarea id="goal-desc" class="form-control" placeholder="Describe your goal here..."
+            <label for="editGoal-desc" class="col-form-label">[description]</label>
+            <textarea id="editGoal-desc" class="form-control" placeholder="Describe your goal here..."
               style="resize: none;"></textarea>
           </div>
           {{!-- Text Box for entering the image link for the goal --}}
           <div class="form-group">
-            <label for="goal-image" class="col-form-label">[image]</label>
-            <input type="text" class="form-control" id="goal-image" placeholder="Enter image address...">
+            <label for="editGoal-image" class="col-form-label">[image]</label>
+            <input type="text" class="form-control" id="editGoal-image" placeholder="Enter image address...">
           </div>
         </form>
       </div>
       {{!-- Close & OK buttons on the modal --}}
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
-        <button id="delete-goal-btn" type="button" class="btn btn-danger" data-dismiss="modal">Clear</button>
+        <button id="delete-goal-btn" type="button" class="btn btn-danger" data-dismiss="modal">Delete</button>
         <button id="update-goal-btn" type="button" class="btn btn-primary">OK</button>
         {{!-- This button should trigger the goal being added to a board--}}
       </div>
@@ -71,7 +92,7 @@
   </div>
 </div>
 
-{{!-- Modal - Pops up when user clicks on "create board" button --}}
+{{!-- Modal - Create Board - Pops up when user clicks on "create board" button --}}
 <div class="modal fade" id="board-modal" tabindex="-1" role="dialog" aria-labelledby="board-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -93,7 +114,7 @@
           <div class="form-group">
             <label for="board-desc" class="col-form-label">What kind of board is this?</label>
             <select id="board-type">
-              <option value="fitness">Fitness</option>
+              <option value="fitness" selected>Fitness</option>
               <option value="career">Career</option>
               <option value="lifestyle">Lifestyle</option>
               <option value="health">Health</option>
@@ -113,8 +134,83 @@
   </div>
 </div>
 
+{{!-- Modal - Sign Up - Pops up when user clicks on "signup" button --}}
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="signup-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="board-modal-title">Create an Account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Box for entering the 'username' --}}
+          <div class="form-group">
+            <label for="newuser-name" class="col-form-label">[name]</label>
+            <input type="text" class="form-control" id="newuser-name" placeholder="Username must be alphanumeric...">
+          </div>
+          <div class="form-group">
+            <label for="newuser-password" class="col-form-label">[password]</label>
+            <input type="password" class="form-control" id="newuser-password" placeholder="Enter a password...">
+          </div>
+        </form>
+      </div>
+      {{!-- Close & Create Account buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+        <button id="confirm-signup-btn" type="button" class="btn btn-primary">Create Account</button>
+        {{!-- The 'Create Account' button should trigger the new user being added to the database (users table) --}}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Modal - Login - Pops up when user clicks on "login" button --}}
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="login-modal-title">Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Box for entering the 'username' --}}
+          <div class="form-group">
+            <label for="user-name" class="col-form-label">[name]</label>
+            <input type="text" class="form-control" id="user-name" placeholder="Enter your username...">
+          </div>
+          <div class="form-group">
+            <label for="user-password" class="col-form-label">[password]</label>
+            <input type="password" class="form-control" id="user-password" placeholder="Enter your password...">
+          </div>
+        </form>
+      </div>
+      {{!-- Close & Create Account buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+        <button id="confirm-login-btn" type="submit" class="btn btn-success">login</button>
+        {{!-- The 'Create Account' button should trigger the new user being added to the database (users table) --}}
+      </div>
+    </div>
+  </div>
+</div>
+
 {{!-- "content-area" is the main div, this takes up the entire screen and displays the background --}}
 <div id="content-area">
+
+  <div id="login-area">
+    <h1>[boarderly]</h1>
+
+    <button id="signup-btn" type="button" class="btn btn-primary btn-md">sign up</button>
+    <button id="login-btn" type="button" class="btn btn-success btn-md">login</button>
+  </div>
 
   {{!-- "boards-list-side" is the left half of the page, this shows the user's boards and the button to create a new board --}}
   <div id="boards-list-side">
@@ -135,7 +231,8 @@
 
     {{!-- "vision-board-area" contains everything from the title of the board down to the buttons, including the board itself --}}
     <div id="vision-board-area">
-      <h2 id="vision-board-title">[ <span id="board-title">board title</span> ]</h2>
+      <h2 id="vision-board-title">[ <span id="board-title" boardID="">select a board</span> ]</h2>
+      <h4 id="vision-board-thisGoal">[ <span id="thisGoal-description"></span> ]</h4>
 
       {{!-- "vision-board" represents the vision board on the right, this should update as users add/edit their goals --}}
       {{!-- the colored/blank placeholder squares that appear at the beginning are created and added in 'boardPage.js' when the page is loaded --}}
@@ -145,7 +242,7 @@
       <section id="vision-board-buttons">
         <button id="add-btn" type="button" class="btn btn-secondary btn-lg">add goal</button>
         <button id="edit-btn" type="button" class="btn btn-primary btn-lg">edit</button>
-        <button id="done-btn" type="button" class="btn btn-success btn-lg">done</button>
+        <button id="done-btn" disabled="true" type="button" class="btn btn-success btn-lg">done</button>
         <button id="full-scr-btn" type="button" class="btn btn-success btn-lg">fullscreen</button>
       </section>
     </div>
@@ -153,29 +250,6 @@
   </div>
 
 </div>
-
-{{!-- This is the navbar that appears at the top of the screen --}}
-<nav id="navbar" class="navbar navbar-expand-lg">
-  <a class="navbar-brand" href="#">[boarderly]</a>
-  {{!-- The title of the page, this should lead to the home page when clicked --}}
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
-    aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarText">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="#">my account</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">about</a>
-      </li>
-    </ul>
-    <span class="navbar-text">
-      hello, user!
-    </span>
-  </div>
-</nav>
 
 {{!-- Area for adding any scripts needed --}}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

@@ -3,11 +3,12 @@ module.exports = function (sequelize, DataTypes) {
         title: {
             type: DataTypes.STRING,
             allowNull: false
-
             // add any extra validation 
+        }, 
+        type: {
+            type: DataTypes.STRING,
+            allowNull: false
         }
-
-
     });
     Board.associate = function(models) {
 
