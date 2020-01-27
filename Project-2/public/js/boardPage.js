@@ -69,8 +69,6 @@ function ConfigureButtons() {
     };
 
     VerifyUserLogin(user);
-
-    $("#login-modal").modal('hide');
   });
 
   // Display the 'Add New Goal' modal when '#add-btn' is clicked
@@ -282,14 +280,11 @@ function CreateUser(userInfo) {
       url: "/api/user",
       data: userInfo
     }).then(function() {
+      let userID = cryptr.encrypt(userInfo.name);
+      localStorage.setItem("ID", userID);  
+      $("#signup-modal").modal('hide');
       ShowHomePage(userInfo.name);
     });
-
-    let userID = cryptr.encrypt(userInfo.name);
-
-    localStorage.setItem("ID", userID);
-
-    $("#signup-modal").modal('hide');
 }
 
 function VerifyNewUser(userInfo) {
@@ -309,6 +304,26 @@ function VerifyNewUser(userInfo) {
     } else {
       $("#newuser-name").removeClass("invalid-field");
       CreateUser(userInfo);
+    }
+  });
+}
+
+function VerifyUserLogin(userInfo) {
+  $.ajax({
+    method: "GET",
+    url: "api/user/" + userInfo.name,
+    data: userInfo
+  }).then(function(result) {    
+    if (result === null || (cryptr.decrypt(userInfo.password) !== cryptr.decrypt(result.password))) {
+      $("#user-name").val("");
+      $("#user-name").addClass("invalid-field");
+      $("#user-password").val("");
+      $("#user-name").attr("placeholder", "Invalid Username/Password");
+      return;
+    } else {
+      $("#user-name").removeClass("invalid-field");
+      $("#login-modal").modal('hide');
+      ShowHomePage(userInfo.name);
     }
   });
 }
