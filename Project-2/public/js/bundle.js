@@ -22679,9 +22679,8 @@ function ConfigureButtons() {
     for (i = 0; i < boardIMGs.length; i++) {
 
       if ($("#editGoal-modal").attr("goal-id") == $(boardIMGs[i]).attr("goal")) {
-        console.log(true);
         $(boardIMGs[i]).attr("desc", "");
-        $(boardIMGs[i]).attr("image", "");
+        $(boardIMGs[i]).attr("img", "");
         $(boardIMGs[i]).css({
           "background-image": "none"
         });
@@ -22992,6 +22991,9 @@ function CreateBoardPreview(board) {
     height: visionBoardSize.height * 0.3
   });
 
+  let title = $("<h3>").text(`"${board.title}"`);
+  newBoard.append(title);
+
   // Add the board preview to the '#user-boards' div and display with an animation
   $("#user-boards").append(newBoard);
   newBoard.hide();
@@ -23059,15 +23061,24 @@ function UpdateBoard(boardID) {
     method: "GET",
     url: "api/goals/" + boardID
   }).then(function(result) {
-    for (i = 0; i < result.length; i++) {
-      $(boardIMGs[i]).attr("goal", result[i].id);
-      $(boardIMGs[i]).attr("desc", result[i].description);
-      $(boardIMGs[i]).attr("img", result[i].image);
+    console.log(result);
 
-      $(boardIMGs[i]).css({
-        "background-image": `url(${result[i].image})`
-      });
-    }
+    for (i = 0; i < 10; i++) {
+      if (!result[i]) {
+        $(boardIMGs[i]).attr("goal", "");
+        $(boardIMGs[i]).attr("desc", "");
+        $(boardIMGs[i]).attr("img", "");
+        $(boardIMGs[i]).css({"background-image": "none"});
+      } else {
+        $(boardIMGs[i]).attr("goal", result[i].id);
+        $(boardIMGs[i]).attr("desc", result[i].description);
+        $(boardIMGs[i]).attr("img", result[i].image);
+        $(boardIMGs[i]).css({
+          "background-image": `url(${result[i].image})`
+        });
+      }
+
+  }
   })
   
 }

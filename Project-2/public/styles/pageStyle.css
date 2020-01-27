@@ -138,6 +138,7 @@ body {
 /* Defines settings for each board preview that is created when user adds a new board, this class is set in 'boardPage.js' whenever (+)/"create-new-board" button is clicked */
 .user-board-preview {
     position: relative;
+    text-align: center;
     display: inline-block;
     margin: 10px;
     box-sizing: border-box;
@@ -145,6 +146,12 @@ body {
     outline: 2px dashed black;
     opacity: 0.8;
     transition: opacity 0.5s;
+}
+
+.user-board-preview h3 {
+    padding: 2px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
 }
 
 .user-board-preview:hover {
