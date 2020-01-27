@@ -1,11 +1,12 @@
-let bcryptjs = require("bcryptjs");
+let Cryptr = require("cryptr");
 let editMode = false;
+let cryptr = new Cryptr("TheSecret");
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
   SetupBackgroundSlideshow();
   ConfigureButtons();
-  // SetUpLogin();
+  CheckIfLoggedIn();
 });
 
 function SetupBackgroundSlideshow() {
@@ -25,7 +26,7 @@ function ConfigureButtons() {
       .find("input[type=checkbox], input[type=radio]")
       .prop("checked", "")
       .end();
-  })
+  });
 
   // Display the 'Create New Account' modal when '#signup-btn' is clicked
   $("#signup-btn").click(function () {
@@ -35,18 +36,25 @@ function ConfigureButtons() {
   // Confirms signup & adds new user to the database if valid
   $("#confirm-signup-btn").click(function() {
     
-    // To Do - Check if username already exists, if so:
-
     let newUser = {
       name: $("#newuser-name").val().trim(),
       email: $("#newuser-email").val().trim(),
-      password: ""
+      password: cryptr.encrypt($("#newuser-password").val().trim())
     };
 
-    let pk = bcryptjs.hash($("#newuser-password").val().trim(), 5, function(err, hash) {
-      newUser.password = hash;
-    });
     FindUser(newUser);
+  });
+
+  // Removes any stored data from local storage and switches back to login page
+  $("#logout-btn").click(function() {
+
+    localStorage.removeItem("ID");
+    
+    $("#boards-list-side").fadeOut('fast');
+    $("#vision-board-side").fadeOut('fast');
+    $("#user-welcome").text("");
+    $("#login-area").fadeIn();
+    
   });
 
   // Display the 'Login' modal when '#login-btn' is clicked
@@ -244,11 +252,19 @@ function ShowHomePage(user) {
     $("#boards-list-side").fadeIn();
     $("#vision-board-side").fadeIn();
 
-    $("#user-welcome").text(`hello, ${user.name}!`);
-    $("#user-welcome").val(`email, ${user.email}!`);
+    $("#user-welcome").text(`hello, ${user}!`);
     $("#user-welcome").fadeIn();
     CreateSampleImages();
   });
+}
+
+function CheckIfLoggedIn() {
+
+  if (localStorage.getItem("ID")) {
+    let username = cryptr.decrypt(localStorage.getItem("ID"));
+    ShowHomePage(username);
+  }
+
 }
 
 /*---------------------------------------------------------------------------------*/
@@ -261,8 +277,12 @@ function CreateUser(userInfo) {
       url: "/api/user",
       data: userInfo
     }).then(function() {
-      ShowHomePage(userInfo);
+      ShowHomePage(userInfo.name);
     });
+
+    let userID = cryptr.encrypt(userInfo.name);
+
+    localStorage.setItem("ID", userID);
 
     $("#signup-modal").modal('hide');
 }
