@@ -22664,13 +22664,22 @@ function ConfigureButtons() {
     $("#done-btn").attr("disabled", false);
 
     let previews = $(".boardIMG").css({
-      "border-color": "darkgreen",
+      "border-color": "red",
       "border-style": "dashed"
     });
   });
   
   $("#update-goal-btn").click(function () {
-    $("#editGoal-modal").modal('hide');
+
+    let goalId = $("#editGoal-modal").attr("goal-id");
+
+    let newGoal = {
+      description: $("#editGoal-desc").val().trim(),
+      image: $("#editGoal-image").val().trim(),
+      BoardId: $("#board-title").attr("boardID")
+    };
+
+    UpdateGoal(newGoal, goalId);
   });
 
   $("#delete-goal-btn").click(function () {
@@ -22763,6 +22772,16 @@ function ConfigureButtons() {
       $("#editGoal-modal").modal('toggle');
       $("#editGoal-modal").attr("goal-id", $(this).attr("goal"));
     }
+  });
+
+  $(document.body).on("mouseenter", ".boardIMG", function() {
+    $("#thisGoal-description").text($(this).attr("desc"));
+    $("#vision-board-thisGoal").fadeIn('fast');
+  });
+
+  $(document.body).on("mouseleave", ".boardIMG", function() {
+    $("#thisGoal-description").text("");
+    $("#vision-board-thisGoal").fadeOut('fast');
   });
 
 }
@@ -23060,8 +23079,25 @@ function DeleteGoal(goalID) {
     method: "DELETE",
     url: "/api/goals/" + goalID
   }).then(function(result) {
-    console.log(result);
-  })
+    console.log(`${result} Goal Removed`);
+  });
+
+}
+
+function UpdateGoal(goalInfo, goalID) {
+
+  let boardID = $("#board-title").attr("boardID");
+
+  $.ajax({
+    method: "PUT",
+    url: "/api/goals/" + goalID,
+    data: goalInfo
+  }).then(function() {
+
+    UpdateBoard(boardID);
+    $("#editGoal-modal").modal('hide');
+
+  });
 
 }
 

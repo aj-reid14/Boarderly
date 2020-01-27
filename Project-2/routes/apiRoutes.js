@@ -84,7 +84,7 @@ module.exports = function(app) {
 
   // update a goal
 
-  app.put("/api/boards/goals/:id", function(req, res) {
+  app.put("/api/goals/:id", function(req, res) {
     db.Goals.update(req.body, {
       where: {
         id: req.params.id

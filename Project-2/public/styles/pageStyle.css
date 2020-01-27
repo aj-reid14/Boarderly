@@ -183,6 +183,15 @@ body {
     user-select: none;
 }
 
+#vision-board-thisGoal {
+    position: absolute;
+    display: none;
+}
+
+#thisGoal-description {
+    color: white;
+}
+
 #vision-board {
     position: relative;
     margin: auto;
