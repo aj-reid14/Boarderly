@@ -22573,7 +22573,6 @@ let visionBoardSize = {
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
-  Refresh();
   SetupBackgroundSlideshow();
   ConfigureButtons();
   CheckIfLoggedIn();
@@ -22887,24 +22886,31 @@ function ShowHomePage(user) {
     $("#boards-list-side").fadeIn();
     $("#vision-board-side").fadeIn();
 
-    $("#user-welcome").text(`hello, ${user}!`);
+    $("#user-welcome").text(`hello, ${user.name}!`);
     $("#user-welcome").fadeIn();
 
     CreateSampleImages();
+    CheckForCreatedBoards(user.id);
   });
 }
 
 function CheckIfLoggedIn() {
 
-  if (localStorage.getItem("ID")) {
-    let username = cryptr.decrypt(localStorage.getItem("ID"));
-    ShowHomePage(username);
+  if (sessionStorage.getItem("ID")) {
+    let username = cryptr.decrypt(sessionStorage.getItem("ID"));
+    $.ajax({
+      method: "GET",
+      url: "api/user/" + username
+    }).then(function (result) {
+      ShowHomePage(result);
+    })
   }
 
 }
 
 function Refresh() {
-  localStorage.clear();
+
+  sessionStorage.clear();
   $("#user-boards").empty();
   $("#board-title").text("select a board");
 
@@ -22921,7 +22927,7 @@ function CreateUser(userInfo) {
     data: userInfo
   }).then(function (result) {
     let userID = cryptr.encrypt(userInfo.name);
-    localStorage.setItem("ID", userID);
+    sessionStorage.setItem("ID", userID);
     $("#signup-modal").modal('hide');
     $("#user-welcome").attr("userid", result.id);
     ShowHomePage(userInfo.name);
@@ -22960,15 +22966,15 @@ function VerifyUserLogin(userInfo) {
       $("#user-name").attr("placeholder", "Invalid Username/Password");
       return;
     } else {
-      if (!localStorage.getItem("ID")) {
+      if (!sessionStorage.getItem("ID")) {
         let userID = cryptr.encrypt(userInfo.name);
-        localStorage.setItem("ID", userID);
+        sessionStorage.setItem("ID", userID);
       }
+
       $("#user-name").removeClass("invalid-field");
       $("#user-welcome").attr("userid", result.id);
       $("#login-modal").modal('hide');
-      ShowHomePage(userInfo.name);
-      CheckForCreatedBoards(result.id);
+      ShowHomePage(result);
     }
   });
 }
