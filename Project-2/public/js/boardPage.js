@@ -1,14 +1,69 @@
-let jwt = require("jsonwebtoken");
+let bcryptjs = require("bcryptjs");
+let salt = bcryptjs.genSaltSync(10);
 let editMode = false;
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
-  CreateSampleImages();
+  SetupBackgroundSlideshow();
   ConfigureButtons();
-  SetUpLogin();
+  // SetUpLogin();
 });
 
+function SetupBackgroundSlideshow() {
+  let backgrounds = [
+  ];
+
+  $("#content-area").css("background-image", "url('../images/backgrounds/nature-1.gif')");
+}
+
 function ConfigureButtons() {
+
+  $('.modal').on('hidden.bs.modal', function (e) {
+    $(this)
+      .find("input,textarea,select")
+      .val('')
+      .end()
+      .find("input[type=checkbox], input[type=radio]")
+      .prop("checked", "")
+      .end();
+  })
+
+  // Display the 'Create New Account' modal when '#signup-btn' is clicked
+  $("#signup-btn").click(function () {
+    $("#signup-modal").modal('toggle');
+  });
+
+  // Confirms signup & adds new user to the database if valid
+  $("#confirm-signup-btn").click(function() {
+    
+    // To Do - Check if username already exists, if so:
+
+    let newUser = {
+      name: $("#newuser-name").val().trim(),
+      email: $("#newuser-email").val().trim(),
+      password: ""
+    };
+
+    let pk = bcryptjs.hash($("#newuser-password").val().trim(), salt, function(err, hash) {
+      newUser.password = hash;
+    });
+
+    console.log(newUser);
+    CreateUser(newUser);
+    
+    $("#signup-modal").modal('hide');
+
+  });
+
+  // Display the 'Login' modal when '#login-btn' is clicked
+  $("#login-btn").click(function () {
+    $("#login-modal").modal('toggle');
+  });
+
+  // Confirms login then shows the main page content
+  $("#confirm-login-btn").click(function () {
+    $("#login-modal").modal('hide');
+  });
 
   // Display the 'Add New Goal' modal when '#add-btn' is clicked
   $("#add-btn").click(function () {
@@ -16,7 +71,7 @@ function ConfigureButtons() {
   });
 
   // Changes the images on the board to 'edit' mode
-  $("#edit-btn").click(function() {
+  $("#edit-btn").click(function () {
 
     editMode = true;
 
@@ -26,9 +81,9 @@ function ConfigureButtons() {
     });
   });
 
-    
+
   // Changes the images on the board back to normal (exit edit mode)
-  $("#done-btn").click(function() {
+  $("#done-btn").click(function () {
 
     editMode = false;
 
@@ -56,23 +111,19 @@ function ConfigureButtons() {
 
       let newBoard = $("<div class='user-board-preview'>");
       let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
-  
+
       // Set width/height to 30% of the main vision board's size
       newBoard.css({
         width: visionBoardRect.width * 0.3,
         height: visionBoardRect.height * 0.3
       });
-  
+
       // Add the board preview to the '#user-boards' div and display with an animation
       $("#user-boards").append(newBoard);
       newBoard.hide();
       newBoard.show({ duration: 100 });
     }
 
-  });
-
-  $(".close-modal").click(function() {
-    ClearModalFields();
   });
 
   // Show fullscreen view of the vision board when 'fullscreen' button is clicked
@@ -90,14 +141,14 @@ function ConfigureButtons() {
     }
   });
 
-  $(".boardIMG").click(function() {
+  $(".boardIMG").click(function () {
 
     if (editMode) {
       $("#editGoal-modal").modal('toggle');
     }
   });
 
-  $("#update-goal-btn").click(function() {
+  $("#update-goal-btn").click(function () {
     $("#edit-mode").modal('hide');
   });
 
@@ -194,27 +245,41 @@ function CreateSampleImages() {
   }
 }
 
-function ClearModalFields() {
-  $("#board-name").text("");
-  $("#goal-image").text("");
-  $("#goal-desc").text("");
-}
+// // This Function sets up the login data
+// function SetUpLogin() {
+//   let token = jwt.sign({
+//     tstUser: "itsMe",
+//     tstPK: "123123"
+//   }, "uSecret", { expiresIn: "1h" });
+//   console.log("Token: " + token);
 
-// This Function sets up the login data
-function SetUpLogin() {
-  let token = jwt.sign({
-    tstUser: "itsMe",
-    tstPK: "123123"
-  }, "uSecret", { expiresIn: "1h" });
-  console.log("Token: " + token);
+//   jwt.verify(token, "uSecret", function (err, decoded) {
+//     if (err) throw err;
+//     console.log(decoded);
+//   });
+// }
 
-  jwt.verify(token, "uSecret", function (err, decoded) {
-    if (err) throw err;
-    console.log(decoded);
+function ShowHomePage(user) {
+  $("#login-area").fadeOut('fast', function() {
+    $("#boards-list-side").fadeIn();
+    $("#vision-board-side").fadeIn();
+
+    $("#user-welcome").text(`hello, ${user}!`);
+    $("#user-welcome").fadeIn();
+    CreateSampleImages();
   });
 }
 
-function ShowMainPage() {
-  $("#boards-list-side").css("display", "initial");
-  $("#vision-board-side").css("display", "initial");
+/*---------------------------------------------------------------------------------*/
+// AJAX FUNCTIONS --- Requests to the database are done in the following functions //
+/*---------------------------------------------------------------------------------*/
+
+function CreateUser(userInfo) {
+  $.ajax({
+    method: "POST",
+    url: "/api/user",
+    data: userInfo
+  }).then(function() {
+    ShowHomePage(userInfo.name);
+  });
 }

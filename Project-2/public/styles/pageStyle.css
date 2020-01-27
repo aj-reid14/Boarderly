@@ -1,6 +1,7 @@
 /* Sets the font for the entire page */
 body {
     font-family: 'Jua', sans-serif;
+    overflow-y: hidden;
 }
 
 /* Defines settings for the main div that holds all of the content */
@@ -9,8 +10,7 @@ body {
     text-align: center;
     width: 100%;
     height: 100%;
-    overflow-y: hidden;
-    background-image: url("../images/nature-1.gif");
+    /* background-image: url("../images/backgrounds/nature-1.gif"); */
     background-size: 100% 100%;
 }
 
@@ -30,6 +30,10 @@ body {
 /* Defines custom color for text on the navbar */
 .nav-link, .navbar-text, .navbar-brand {
     color: white;
+}
+
+#user-welcome {
+    display: none;
 }
 
 /* This sets the title of the navbar "[boarderly]" to the middle of the navbar */
@@ -54,6 +58,14 @@ body {
     display: inline-block;
     z-index: 10;
     margin: 10% auto;
+    user-select: none;
+}
+
+#login-area h1 {
+    padding: 1%;
+    color: darkred;
+    border-bottom: 6px groove rgb(63, 0, 0);
+    animation: colorChange 3s linear infinite alternate forwards; 
 }
 
 /* Sets default background colors for left & right divs in the page (not shown when background images are showing) */
@@ -233,4 +245,12 @@ body {
       33% {transform: rotateZ(-5deg);}
       66% {transform: rotateZ(5deg);}
       100% {transform: rotateZ(0deg); opacity: 1;}
+  }
+
+  /**********************/
+  /* #login-area h1 (slogan) Animations */
+  /**********************/
+
+  @keyframes colorChange {
+      to {color: whitesmoke;}
   }

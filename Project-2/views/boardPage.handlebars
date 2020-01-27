@@ -15,13 +15,11 @@
         <a class="nav-link" href="#">about</a>
       </li>
     </ul>
-    <span class="navbar-text">
-      hello, user!
-    </span>
+    <span id="user-welcome" class="navbar-text"></span>
   </div>
 </nav>
 
-{{!-- Modal - Pops up when user clicks on "add goal" button --}}
+{{!-- Modal - Add Goal - Pops up when user clicks on "add goal" button --}}
 <div class="modal fade" id="goal-modal" tabindex="-1" role="dialog" aria-labelledby="goal-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -57,7 +55,7 @@
   </div>
 </div>
 
-{{!-- Modal - Pops up when user clicks on a goal image when edit mode --}}
+{{!-- Modal - Edit Goal - Pops up when user clicks on a goal image when edit mode --}}
 <div class="modal fade" id="editGoal-modal" tabindex="-1" role="dialog" aria-labelledby="editGoal-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -94,7 +92,7 @@
   </div>
 </div>
 
-{{!-- Modal - Pops up when user clicks on "create board" button --}}
+{{!-- Modal - Create Board - Pops up when user clicks on "create board" button --}}
 <div class="modal fade" id="board-modal" tabindex="-1" role="dialog" aria-labelledby="board-modal-title"
   aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
@@ -136,17 +134,83 @@
   </div>
 </div>
 
+{{!-- Modal - Sign Up - Pops up when user clicks on "signup" button --}}
+<div class="modal fade" id="signup-modal" tabindex="-1" role="dialog" aria-labelledby="signup-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="board-modal-title">Create an Account</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Box for entering the 'username' --}}
+          <div class="form-group">
+            <label for="newuser-name" class="col-form-label">[name]</label>
+            <input type="text" class="form-control" id="newuser-name" placeholder="Enter your username...">
+          </div>
+          <div class="form-group">
+            <label for="newuser-email" class="col-form-label">[email]</label>
+            <input type="text" class="form-control" id="newuser-email" placeholder="Enter your email...">
+          </div>
+          <div class="form-group">
+            <label for="newuser-password" class="col-form-label">[password]</label>
+            <input type="password" class="form-control" id="newuser-password" placeholder="Enter a password...">
+          </div>
+        </form>
+      </div>
+      {{!-- Close & Create Account buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+        <button id="confirm-signup-btn" type="button" class="btn btn-primary">Create Account</button>
+        {{!-- The 'Create Account' button should trigger the new user being added to the database (users table) --}}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Modal - Login - Pops up when user clicks on "login" button --}}
+<div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="login-modal-title"
+  aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="login-modal-title">Login</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          {{!-- Text Box for entering the 'username' --}}
+          <div class="form-group">
+            <label for="user-name" class="col-form-label">[name]</label>
+            <input type="text" class="form-control" id="user-name" placeholder="Enter your username...">
+          </div>
+          <div class="form-group">
+            <label for="user-password" class="col-form-label">[password]</label>
+            <input type="password" class="form-control" id="user-password" placeholder="Enter your password...">
+          </div>
+        </form>
+      </div>
+      {{!-- Close & Create Account buttons on the modal --}}
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary close-modal" data-dismiss="modal">Close</button>
+        <button id="confirm-login-btn" type="submit" class="btn btn-success">login</button>
+        {{!-- The 'Create Account' button should trigger the new user being added to the database (users table) --}}
+      </div>
+    </div>
+  </div>
+</div>
+
 {{!-- "content-area" is the main div, this takes up the entire screen and displays the background --}}
 <div id="content-area">
 
   <div id="login-area">
-    {{!-- <label for="user-name">username</label>
-    <input id="user-name" type="text"> <br />
-
-    <label for="user-pasword">password</label>
-    <input id="user-password" type="password"> <br /> --}}
-
-    <h1>Design Your Future!</h1>
+    <h1>[boarderly]</h1>
 
     <button id="signup-btn" type="button" class="btn btn-primary btn-md">sign up</button>
     <button id="login-btn" type="button" class="btn btn-success btn-md">login</button>
