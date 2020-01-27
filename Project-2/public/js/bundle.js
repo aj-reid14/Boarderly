@@ -22565,9 +22565,15 @@ module.exports = Cryptr;
 let Cryptr = require("cryptr");
 let editMode = false;
 let cryptr = new Cryptr("TheSecret");
+let sampleImagesCreated = false;
+let visionBoardSize = {
+  width: parseInt("800px", 10),
+  height: parseInt("375px", 10)
+};
 
 $(document).ready(function () {
   // When the page is loaded, these functions will run:
+  localStorage.clear();
   SetupBackgroundSlideshow();
   ConfigureButtons();
   CheckIfLoggedIn();
@@ -22669,7 +22675,7 @@ function ConfigureButtons() {
     $("#board-modal").modal('toggle');
   });
 
-  // Creates a ".user-board-preview" when user clicks to create a new board:
+  // Creates a ".user-board-preview" when user clicks "OK" to create a new board:
   $("#confirm-board-btn").click(function () {
 
     // Checks if board name is valid before creating the board
@@ -22679,26 +22685,11 @@ function ConfigureButtons() {
       UserId: $("#user-welcome").attr("userid")
     };
 
-    if (board.boardName === "") {
+    if (board.title === "") {
+      $("#board-name").val("");
       $("#board-name").attr("placeholder", "Enter a valid name!");
-    } else {
-      $("#board-modal").modal('hide');
-  
-      AddNewBoard(board);
-
-      let newBoard = $("<div class='user-board-preview'>");
-      let visionBoardRect = $("#vision-board")[0].getBoundingClientRect();
-
-      // Set width/height to 30% of the main vision board's size
-      newBoard.css({
-        width: visionBoardRect.width * 0.3,
-        height: visionBoardRect.height * 0.3
-      });
-
-      // Add the board preview to the '#user-boards' div and display with an animation
-      $("#user-boards").append(newBoard);
-      newBoard.hide();
-      newBoard.show({ duration: 100 });
+    } else {  
+      GenerateNewBoard(board);
     }
 
   });
@@ -22732,6 +22723,10 @@ function ConfigureButtons() {
 
 // This function creates and adds the 10 squares for goals on the vision board:
 function CreateSampleImages() {
+
+  if (!sampleImagesCreated) {
+
+    sampleImagesCreated = true;
 
   // Array of 10 colors (1 for each goal) that will be randomly chosen as the default background color for each goal on the vision board
   let colors = [
@@ -22820,6 +22815,7 @@ function CreateSampleImages() {
 
   }
 }
+}
 
 function ShowHomePage(user) {
   $("#login-area").fadeOut('fast', function() {
@@ -22828,6 +22824,7 @@ function ShowHomePage(user) {
 
     $("#user-welcome").text(`hello, ${user}!`);
     $("#user-welcome").fadeIn();
+
     CreateSampleImages();
   });
 }
@@ -22852,7 +22849,7 @@ function CreateUser(userInfo) {
       data: userInfo
     }).then(function(result) {
       let userID = cryptr.encrypt(userInfo.name);
-      localStorage.setItem("ID", userID);  
+      localStorage.setItem("ID", userID);
       $("#signup-modal").modal('hide');
       $("#user-welcome").attr("userid", result.id);
       ShowHomePage(userInfo.name);
@@ -22863,8 +22860,7 @@ function VerifyNewUser(userInfo) {
 
   $.ajax({
     method: "GET",
-    url: "api/createuser/" + userInfo.name,
-    data: userInfo
+    url: "api/createuser/" + userInfo.name
   }).then(function(result) {
     console.log(result);
     if (result !== null) {
@@ -22883,8 +22879,7 @@ function VerifyNewUser(userInfo) {
 function VerifyUserLogin(userInfo) {
   $.ajax({
     method: "GET",
-    url: "api/user/" + userInfo.name,
-    data: userInfo
+    url: "api/user/" + userInfo.name
   }).then(function(result) {    
     if (result === null || (cryptr.decrypt(userInfo.password) !== cryptr.decrypt(result.password))) {
       $("#user-name").val("");
@@ -22893,21 +22888,61 @@ function VerifyUserLogin(userInfo) {
       $("#user-name").attr("placeholder", "Invalid Username/Password");
       return;
     } else {
+      if (!localStorage.getItem("ID")) {
+        let userID = cryptr.encrypt(userInfo.name);
+        localStorage.setItem("ID", userID);
+      }
       $("#user-name").removeClass("invalid-field");
       $("#user-welcome").attr("userid", result.id);
       $("#login-modal").modal('hide');
       ShowHomePage(userInfo.name);
+      CheckForCreatedBoards(result.id);
     }
   });
 }
 
-function AddNewBoard(boardInfo) {
+function GenerateNewBoard(boardInfo) {
   $.ajax({
     method: "POST",
     url: "api/boards/" + boardInfo.UserId,
     data: boardInfo
   }).then(function(result) {
-    console.log(result);
+    if (!result) {
+      console.log("New Board failed.");
+    } else {
+      CreateBoardPreview(result.id);
+    }
   });
+}
+
+function CheckForCreatedBoards(userID) {
+  $.ajax({
+    method: "GET",
+    url: "api/boards/" + userID
+  }).then(function(result) {
+    
+    console.log(result);
+    
+    for (i = 0; i < result.length; i++) {
+      CreateBoardPreview(result[i].id);
+    }
+  });
+}
+
+function CreateBoardPreview(id) {
+  let newBoard = $(`<div class='user-board-preview' boardID='${id}'>`);
+
+  // Set width/height to 30% of the main vision board's size
+  newBoard.css({
+    width: visionBoardSize.width * 0.3,
+    height: visionBoardSize.height * 0.3
+  });
+
+  // Add the board preview to the '#user-boards' div and display with an animation
+  $("#user-boards").append(newBoard);
+  newBoard.hide();
+  newBoard.show({ duration: 100 });
+
+  $("#board-modal").modal('hide');
 }
 },{"cryptr":156}]},{},[157]);

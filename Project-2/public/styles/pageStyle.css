@@ -176,10 +176,6 @@ body {
     user-select: none;
 }
 
-#vision-board-title:hover {
-    color: limegreen;
-}
-
 #vision-board {
     position: relative;
     margin: auto;

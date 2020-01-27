@@ -6,8 +6,12 @@ module.exports = function(app) {
 
   // Get all boards
 
-  app.get("/api/boards", function(req, res) {
-    db.Board.findAll({}).then(function(dbBoard) {
+  app.get("/api/boards/:userid", function(req, res) {
+    db.Board.findAll({
+      where: {
+        UserId: req.params.userid
+      }
+    }).then(function(dbBoard) {
       res.json(dbBoard);
     });
   });
