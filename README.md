@@ -11,9 +11,8 @@ The edit button is
 
 ## Built with: 
 
-- Google Images API 
 - [Bootstrap 4.3.1](https://getbootstrap.com/)
-- MySQL Workbench
+- Sequelize
 - Cryptr NPM Package 
 
 ## Boardely team: 
