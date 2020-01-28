@@ -5,17 +5,18 @@ to help clarify and concentrate on one's goals as visualization is one powerful 
 
 ## Create a new board
 
-To create a board, find images by searching in the web with the "Enter a Goal" tool. 
+To create a board, click on the add goal button to add a goal and represent it with an image. 
+The edit button is 
 
-## Boards 
-
-Add a Board to your profile so you can share them with your friends. 
 
 ## Built with: 
 
 - Google Images API 
 - [Bootstrap 4.3.1](https://getbootstrap.com/)
 - MySQL Workbench
+- Cryptr NPM Package 
 
 ## Boardely team: 
-
+- Andre Reid
+- Paola Larrazabal
+- Miranda Hidalgo
